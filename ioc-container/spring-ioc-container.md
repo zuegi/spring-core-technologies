@@ -207,23 +207,22 @@ erlauben die ApplicationContext-Implementierungen auch die Registrierung bestehe
 Dies geschieht durch den Zugriff auf die BeanFactory des ApplicationContext über die Methode getBeanFactory(), die die Implementierung der BeanFactory DefaultListableBeanFactory zurückgibt. 
 DefaultListableBeanFactory unterstützt diese Registrierung durch die Methoden registerSingleton(..) und registerBeanDefinition(..). Typische Anwendungen arbeiten jedoch ausschließlich mit Beans, die durch reguläre Bean-Definitions-Metadaten definiert sind.
 
-```text
 Bean-Metadaten und manuell bereitgestellte Singleton-Instanzen müssen so früh wie möglich registriert werden, damit der Container sie während des Autowiring und anderer Introspektionsschritte richtig interpretieren kann.
 Während das Überschreiben vorhandener Metadaten und vorhandener Singleton-Instanzen bis zu einem gewissen Grad unterstützt wird, wird die Registrierung neuer Beans zur Laufzeit (gleichzeitig mit dem Live-Zugriff auf die Factory) 
 nicht offiziell unterstützt und kann zu Ausnahmen bei gleichzeitigem Zugriff, zu einem inkonsistenten Zustand im Bean-Container oder zu beidem führen.
-```
+
 
 ok, bis hierhin ist es eigentlich keine Zusammenfassung sondern eine Übersetzung
 
 ### Beans benennen
 Jedes Bean hat einen unique identifier - ob er über das Attribute **id** angegeben wird oder nicht.
 
-```text
-Beim Scannen von Komponenten im Klassenpfad generiert Spring Bean-Namen für unbenannte Komponenten und folgt dabei den zuvor beschriebenen Regeln:
-Im Wesentlichen wird der einfache Klassenname genommen und sein erstes Zeichen in einen Kleinbuchstaben umgewandelt.
-In dem (ungewöhnlichen) Sonderfall, dass es mehr als ein Zeichen gibt und sowohl das erste als auch das zweite Zeichen Großbuchstaben sind,
-wird die ursprüngliche Schreibweise beibehalten. Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier verwendet).
-```
+Beim Scannen von Komponenten im Klassenpfad generiert Spring Bean-Namen für unbenannte Komponenten und folgt den Regeln:
+* Im Wesentlichen wird der einfache Klassenname genommen und sein erstes Zeichen in einen Kleinbuchstaben umgewandelt.
+* In dem (ungewöhnlichen) Sonderfall, dass es mehr als ein Zeichen gibt und sowohl das erste als auch das zweite Zeichen Großbuchstaben sind,
+wird die ursprüngliche Schreibweise beibehalten. 
+* Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier verwendet).
+
 
 Bean Konfiguration mit einer eindeutigen Id und 2 Aliases, separiert durch ein Komma und zugehörigen validen Aufrufen im Code
 ````xml
@@ -247,7 +246,7 @@ Bean Konfiguration ohne definierte id oder name Attribut
     SpringBean2 springBean2 = context.getBean(SpringBean2.class);
 ````
 
-Bean Konfiguration mit Sonderzeichen: Wenn auch üblich oder konventionell ist, dass die Namen der Attributte **aplhanumerisch**, meistens mit einem **Kleinbuchstaben** und in **CamelCase** ('sprinBean', 'myBean') geschrieben sind,
+Bean Konfiguration mit Sonderzeichen: Wenn auch üblich oder konventionell ist, dass die Namen der Attributte **alphanumerisch**, meistens mit einem **Kleinbuchstaben** und in **CamelCase** ('sprinBean', 'myBean') geschrieben sind,
 können die Attribute _id_ und _name_ auch **Sonderzeichen** enthalten sowie mit **,** oder **;** unterteilt werden.
 ````xml
     <bean id="$$*ç%" class="ch.wesr.spring.core.container.xml.beans.SpringBean3"/>
@@ -265,10 +264,13 @@ Bean Konfiguration ohne _id_ Attribut, kann über eines der Aliase aufgerufen we
 ````
 **Warum gibt es die Möglichkeit einem Bean Aliases zu definieren?**
 
-In einer Bean-Definition selbst können Sie mehr als einen Namen für die Bean angeben, indem Sie eine Kombination aus bis zu einem Namen, der durch das Attribut id angegeben wird, und einer beliebigen Anzahl anderer Namen im Attribut name verwenden. Diese Namen können äquivalente Aliase für dieselbe Bean sein und sind in einigen Situationen nützlich, wie z.B. wenn jede Komponente in einer Anwendung auf eine gemeinsame Abhängigkeit verweisen soll, indem ein Bean-Name verwendet wird, der spezifisch für diese Komponente selbst ist.
+In einer Bean-Definition selbst kann man mehr als einen Namen für die Bean angeben. Dies geschieht mit einer Kombination aus einem **id** Attribut und einer beliebigen Anzahl **Aliases**.
+Diese Namen können äquivalente Aliase für dieselbe Bean sein und sind in einigen Situationen nützlich, wie z.B. wenn jede Komponente in einer Anwendung auf eine gemeinsame Abhängigkeit verweisen soll, indem ein Bean-Name verwendet wird, der spezifisch für diese Komponente selbst ist.
 
 ##### Aliasing a Bean outside the Bean Definition
-Die Angabe aller Aliase an den Stellen, an denen die Bean tatsächlich definiert ist, ist jedoch nicht immer ausreichend. Manchmal ist es wünschenswert, einen Alias für eine Bean einzuführen, die an anderer Stelle definiert ist. Dies ist häufig in großen Systemen der Fall, in denen die Konfiguration auf die einzelnen Subsysteme aufgeteilt ist, wobei jedes Subsystem seinen eigenen Satz von Objektdefinitionen hat. In XML-basierten Konfigurationsmetadaten können Sie das <alias/>-Element verwenden, um dies zu erreichen. Das folgende Beispiel zeigt, wie man das macht:
+Die Angabe aller Aliase an den Stellen, an denen die Bean tatsächlich definiert ist, ist jedoch nicht immer ausreichend. 
+Manchmal ist es wünschenswert, einen Alias für eine Bean einzuführen, die an anderer Stelle definiert ist. 
+Dies ist häufig in großen Systemen der Fall, in denen die Konfiguration auf die einzelnen Subsysteme aufgeteilt ist, wobei jedes Subsystem seinen eigenen Satz von Objektdefinitionen hat.
 
 ````xml
     <alias name="customBean1" alias="subsystemA-customBean1"/>
