@@ -213,4 +213,78 @@ Während das Überschreiben vorhandener Metadaten und vorhandener Singleton-Inst
 nicht offiziell unterstützt und kann zu Ausnahmen bei gleichzeitigem Zugriff, zu einem inkonsistenten Zustand im Bean-Container oder zu beidem führen.
 ```
 
+ok, bis hierhin ist es eigentlich keine Zusammenfassung sondern eine Übersetzung
+
 ### Beans benennen
+Jedes Bean hat einen unique identifier - ob er über das Attribute **id** angegeben wird oder nicht.
+
+```text
+Beim Scannen von Komponenten im Klassenpfad generiert Spring Bean-Namen für unbenannte Komponenten und folgt dabei den zuvor beschriebenen Regeln:
+Im Wesentlichen wird der einfache Klassenname genommen und sein erstes Zeichen in einen Kleinbuchstaben umgewandelt.
+In dem (ungewöhnlichen) Sonderfall, dass es mehr als ein Zeichen gibt und sowohl das erste als auch das zweite Zeichen Großbuchstaben sind,
+wird die ursprüngliche Schreibweise beibehalten. Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier verwendet).
+```
+
+Bean Konfiguration mit einer eindeutigen Id und 2 Aliases, separiert durch ein Komma und zugehörigen validen Aufrufen im Code
+````xml
+    <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+````
+````java
+    SpringBean springBean = context.getBean(SpringBean.class);
+    // oder
+    SpringBean springBean = (SpringBean) context.getBean("springBean");
+    // oder
+    SpringBean springBean1 = (SpringBean) context.getBean("customBean");
+    // oder
+    SpringBean springBean2 = (SpringBean) context.getBean("dedicatedBean");
+````
+
+Bean Konfiguration ohne definierte id oder name Attribut
+````xml
+    <bean class="ch.wesr.spring.core.container.xml.beans.SpringBean2"/>
+````
+````java
+    SpringBean2 springBean2 = context.getBean(SpringBean2.class);
+````
+
+Bean Konfiguration mit Sonderzeichen: Wenn auch üblich oder konventionell ist, dass die Namen der Attributte **aplhanumerisch**, meistens mit einem **Kleinbuchstaben** und in **CamelCase** ('sprinBean', 'myBean') geschrieben sind,
+können die Attribute _id_ und _name_ auch **Sonderzeichen** enthalten sowie mit **,** oder **;** unterteilt werden.
+````xml
+    <bean id="$$*ç%" class="ch.wesr.spring.core.container.xml.beans.SpringBean3"/>
+````
+````java
+    SpringBean3 springBean2 = context.getBean("spring-Bean$3");
+````
+
+Bean Konfiguration ohne _id_ Attribut, kann über eines der Aliase aufgerufen werden, auch wenn dieses Sonderzeichen enthält.
+````xml
+    <bean name="schnullifax;%ç*$$" class="ch.wesr.spring.core.container.xml.beans.SpringBean5"/>
+````
+````java
+    SpringBean5 springBean5 = (SpringBean5) context.getBean("%ç*$$");
+````
+**Warum gibt es die Möglichkeit einem Bean Aliases zu definieren?**
+
+In einer Bean-Definition selbst können Sie mehr als einen Namen für die Bean angeben, indem Sie eine Kombination aus bis zu einem Namen, der durch das Attribut id angegeben wird, und einer beliebigen Anzahl anderer Namen im Attribut name verwenden. Diese Namen können äquivalente Aliase für dieselbe Bean sein und sind in einigen Situationen nützlich, wie z.B. wenn jede Komponente in einer Anwendung auf eine gemeinsame Abhängigkeit verweisen soll, indem ein Bean-Name verwendet wird, der spezifisch für diese Komponente selbst ist.
+
+##### Aliasing a Bean outside the Bean Definition
+Die Angabe aller Aliase an den Stellen, an denen die Bean tatsächlich definiert ist, ist jedoch nicht immer ausreichend. Manchmal ist es wünschenswert, einen Alias für eine Bean einzuführen, die an anderer Stelle definiert ist. Dies ist häufig in großen Systemen der Fall, in denen die Konfiguration auf die einzelnen Subsysteme aufgeteilt ist, wobei jedes Subsystem seinen eigenen Satz von Objektdefinitionen hat. In XML-basierten Konfigurationsmetadaten können Sie das <alias/>-Element verwenden, um dies zu erreichen. Das folgende Beispiel zeigt, wie man das macht:
+
+````xml
+    <alias name="customBean1" alias="subsystemA-customBean1"/>
+    <alias name="customBean1" alias="subsystemB-customBean1"/>
+````
+```java
+    SpringBean1 subsystemACustomBean1 = (SpringBean1) context.getBean("subsystemA-customBean1");
+    subsystemACustomBean1.sayHelloFrom();
+
+    SpringBean1 subsystemBCustomBean1 = (SpringBean1) context.getBean("subsystemB-customBean1");
+    subsystemBCustomBean1.sayHelloFrom();
+```
+Wichtig dabei ist zu wissen, dass sich trotzdem immer um dasselbe Bean handelt.
+Darum wird dieser Mechanismus oftmals bei Datsourcen verwendet, bei welchem ein Bean die Datenbankverbindung erstellt und in verschiedenen Sub-Modulen einer Applikation verwendet wird.
+```text
+Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
+Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
+```
+Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)

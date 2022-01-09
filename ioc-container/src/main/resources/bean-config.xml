@@ -3,5 +3,18 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+    <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+
+    <bean id="springBean1" name="customBean1, dedicatedBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
+
+    <bean class="ch.wesr.spring.core.container.xml.beans.SpringBean2"/>
+
+    <bean id="spring-Bean$3" class="ch.wesr.spring.core.container.xml.beans.SpringBean3"/>
+
+    <bean id="$$*ç%" class="ch.wesr.spring.core.container.xml.beans.SpringBean4"/>
+
+    <bean name="schnullifax;%ç*$$" class="ch.wesr.spring.core.container.xml.beans.SpringBean5"/>
+
+    <alias name="customBean1" alias="subsystemA-customBean1"/>
+    <alias name="customBean1" alias="subsystemB-customBean1"/>
 </beans>
