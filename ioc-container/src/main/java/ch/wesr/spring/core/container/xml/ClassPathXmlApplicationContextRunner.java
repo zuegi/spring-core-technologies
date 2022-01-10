@@ -21,7 +21,7 @@ public class ClassPathXmlApplicationContextRunner {
         springBean.sayHello();
 
         SpringBean1 customBean1 = (SpringBean1) context.getBean("customBean1");
-        customBean1.sayHelloFrom();
+        customBean1.sayHello();
 
         SpringBean2 springBean2 = context.getBean(SpringBean2.class);
         springBean2.sayHello();
@@ -36,10 +36,10 @@ public class ClassPathXmlApplicationContextRunner {
         springBean5.sayHello();
 
         SpringBean1 subsystemACustomBean1 = (SpringBean1) context.getBean("subsystemA-customBean1");
-        subsystemACustomBean1.sayHelloFrom();
+        subsystemACustomBean1.sayHello();
 
         SpringBean1 subsystemBCustomBean1 = (SpringBean1) context.getBean("subsystemB-customBean1");
-        subsystemBCustomBean1.sayHelloFrom();
+        subsystemBCustomBean1.sayHello();
 
 
 

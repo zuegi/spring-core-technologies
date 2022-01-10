@@ -362,3 +362,32 @@ Wie schon einmal erwähnt ist das **ApplicationContext**  ein Sub-Interface von 
 ````
 
 Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+
+## Dependency Injection
+* Constructor-based
+* Setter-based
+
+### Constructor Argument Resolution
+
+Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments.
+Sind die **<constructor-arg/>** eindeutige, so muss die Reihenfolge Argumente der Bean-Definition
+
+````xml
+    <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedBean">
+        <constructor-arg ref="springBean1"/>
+        <constructor-arg ref="springBean"/> <-- in untenstehendem Konstruktor ist die Defintion des SpringBean an erster Stelle
+    </bean>
+
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+
+    <bean id="springBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
+````
+und die Reihenfolge der Argumente im Konstruktor nicht übereinstimme.
+````java
+public class ConstructorBasedBean {
+    
+    public ConstructorBasedBean(SpringBean springBean, SpringBean1 springBean1) {
+        // ...
+    }
+}
+````
