@@ -17,4 +17,16 @@
 
     <alias name="customBean1" alias="subsystemA-customBean1"/>
     <alias name="customBean1" alias="subsystemB-customBean1"/>
+
+    <bean id="springBeanService" class="ch.wesr.spring.core.container.xml.beans.SpringBeanService" factory-method="erstelleSpringBeanService"/>
+
+    <bean id="serviceLocator" class="ch.wesr.spring.core.container.xml.beans.DefaultServiceLocator"/>
+
+    <bean id="springBeanServiceByLocator"
+          factory-bean="serviceLocator"
+          factory-method="erstelleSpringBeanService1"/>
+
+    <bean id="clientServiceByLocator"
+          factory-bean="serviceLocator"
+          factory-method="erstelleClientService"/>
 </beans>

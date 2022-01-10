@@ -223,7 +223,6 @@ Beim Scannen von Komponenten im Klassenpfad generiert Spring Bean-Namen für unb
 wird die ursprüngliche Schreibweise beibehalten. 
 * Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier verwendet).
 
-
 Bean Konfiguration mit einer eindeutigen Id und 2 Aliases, separiert durch ein Komma und zugehörigen validen Aufrufen im Code
 ````xml
     <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
@@ -289,4 +288,77 @@ Darum wird dieser Mechanismus oftmals bei Datsourcen verwendet, bei welchem ein 
 Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
 Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
 ```
+Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+
+### Beans instanzieren
+Eine Bean Definition erzeugt eines oder mehrere Objekte.
+In XML-basierten Konfigurationsmetadaten, gibt man den Typ (oder die Klasse) des Objekts, das instanziiert werden soll, im class-Attribut des <bean/>-Elements an. 
+Dieses class-Attribut (das intern eine Class-Eigenschaft einer BeanDefinition-Instanz ist) ist normalerweise obligatorisch.
+Nur wenn man eine Factory Bean Methode verwendet ist dieses class Attribut hinfällig.
+
+Es gibt 2 verschiedene Arten wie man ein Bean instanzieren kann.
+
+**Wenn der Konstruktor reflektiv durch den Container aufgerufen wird.**
+````xml
+    <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+````
+````java
+    SpringBean springBean = context.getBean(SpringBean.class);
+````
+
+**Wenn die zu instanzierende Klasse eine static Factory Method besitzt.** 
+
+```xml
+<bean id="springBeanService" 
+      class="ch.wesr.spring.core.container.xml.beans.SpringBeanService" 
+      factory-method="erstelleSpringBeanService"/>
+```
+````java
+    ApplicationContext context = new ClassPathXmlApplicationContext("bean-config.xml");
+    SpringBeanService springBeanService = context.getBean(SpringBeanService.class);
+    springBeanService.sayHello();
+````
+
+**Wenn es eine Factory Bean Methode gibt**
+
+Zuerst muss man natürlich die Factory Bean konfigurieren.
+
+**Achtung:** Dieses Factory Bean bezieht sich auf ein Bean, welches im Container konfiguriert und über den Konstruktor oder eine statische factor method erzeugt wurde.
+Im Kontrast zu einem **FactoryBean**, welches eine **Spring-spezfische Implementierungsklasse** ist.
+````xml
+<bean id="serviceLocator" class="ch.wesr.spring.core.container.xml.beans.DefaultServiceLocator"/>
+````
+Danach kann in der Konfiguration das **class** Attribut weggelassen werden.
+Zudem ist es auch möglich in einer Factory Bean mehrere Instanzen von verschiedenen Objekten zu erzeugen.
+```xml
+    <bean id="springBeanServiceByLocator"
+          factory-bean="serviceLocator"
+          factory-method="erstelleSpringBeanService"/>
+
+    <bean id="clientServiceByLocator"
+          factory-bean="serviceLocator"
+          factory-method="erstelleClientService"/>
+```
+````java
+    SpringBeanService1 springBeanService1 = context.getBean(SpringBeanService1.class);
+    springBeanService1.sayHello();
+
+    ClientService clientService = context.getBean(ClientService.class);
+    lientService.sayHello();
+````
+**Wie kann ich den Typ einer Bean herausfinden?**
+
+Der empfohlene Weg, um den tatsächlichen Laufzeittyp einer bestimmten Bean herauszufinden, ist ein BeanFactory.getType-Aufruf für den angegebenen Bean-Namen. 
+Dabei werden alle oben genannten Fälle berücksichtigt und der Objekttyp zurückgegeben, den ein BeanFactory.getBean-Aufruf für denselben Bean-Namen zurückgeben wird.
+
+Wie schon einmal erwähnt ist das **ApplicationContext**  ein Sub-Interface von **BeanFactory**
+````java
+    String clientServiceByLocator = context.getType("clientServiceByLocator").getName();
+    assert clientServiceByLocator.equals("ch.wesr.spring.core.container.xml.beans.ClientService");
+    System.out.println("Type of bean: " +clientServiceByLocator);
+    // oder
+    Class<?> clientServiceByLocator1 = context.getType("clientServiceByLocator");
+    assert Objects.requireNonNull(clientServiceByLocator1).isInstance(ClientService.class);
+````
+
 Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
