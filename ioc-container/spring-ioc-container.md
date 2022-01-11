@@ -370,7 +370,8 @@ Das gesamte Code Beispiel findest du in der Klasse [InstanceFactoryBeanRunner.ja
 * Constructor-based
 * Setter-based
 
-### Constructor Argument Resolution
+### Constructor-based
+#### Constructor Argument Resolution
 
 Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments.
 Sind die **<constructor-arg/>** eindeutig, z.B. wenn ein anderes Bean referenziert wird, so muss die Reihenfolge Argumente der Bean-Definition
@@ -395,7 +396,7 @@ public class ConstructorBasedBean {
 ````
 Code Beispiel: [SimpleConstructorBasedRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorBasedRunner.java)
 
-### Constructor argument type matching
+#### Constructor argument type matching
 Wenn ein einfacher Typ verwendet wird, wie z.B. <value>true</value>, kann Spring den Typ des Wertes nicht bestimmen und kann daher nicht ohne Hilfe nach Typ abgleichen.
 Der Container kann einfache Typen nur auflösen, wenn diese in der Bean Definition mit dem **type** Attribut angegeben werden.
 
@@ -420,7 +421,7 @@ public class ConstructorBasedTypeMatchingBean {
 ````
 Code Beispiel: [SimpleConstructorTypeMatchingRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorTypeMatchingRunner.java)
 
-### Constructor argument index
+#### Constructor argument index
 Beim Index Konstruktor werden nicht die Typen angegeben, sondern die Indices.
 
 **Der Index beginnt bei 0**.
@@ -432,7 +433,7 @@ Beim Index Konstruktor werden nicht die Typen angegeben, sondern die Indices.
 ````
 Code Beispiel: [SimpleConstructorTypeIndexRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorTypeIndexRunner.java)
 
-### Constructor argument name
+#### Constructor argument name
 Die Argumente können aber auch über die Namen definiert werden
 Dabei spielte die Reihenfolge der Benennung der **constructor-arg** keine Rolle.
 ````xml
