@@ -292,8 +292,8 @@ Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationCont
 
 ### Beans instanzieren
 Eine Bean Definition erzeugt eines oder mehrere Objekte.
-In XML-basierten Konfigurationsmetadaten, gibt man den Typ (oder die Klasse) des Objekts, das instanziiert werden soll, im class-Attribut des <bean/>-Elements an. 
-Dieses class-Attribut (das intern eine Class-Eigenschaft einer BeanDefinition-Instanz ist) ist normalerweise obligatorisch.
+In XML-basierten Konfigurationsmetadaten, gibt man den Typ (oder die Klasse) des Objekts, das instanziiert werden soll, im **class** Attribut des **<bean/>** Elements an. 
+Dieses **class** Attribut (das intern eine Class-Eigenschaft einer BeanDefinition-Instanz ist) ist normalerweise obligatorisch.
 Nur wenn man eine Factory Bean Methode verwendet ist dieses class Attribut hinfällig.
 
 Es gibt 2 verschiedene Arten wie man ein Bean instanzieren kann.
@@ -303,8 +303,11 @@ Es gibt 2 verschiedene Arten wie man ein Bean instanzieren kann.
     <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 ````
 ````java
+    ApplicationContext context = new ClassPathXmlApplicationContext("bean-config.xml");
+
     SpringBean springBean = context.getBean(SpringBean.class);
 ````
+Code unter: [InstantiatingBeanRunner.java](src/main/java/ch/wesr/spring/core/container/xml/InstantiatingBeanRunner.java)
 
 **Wenn die zu instanzierende Klasse eine static Factory Method besitzt.** 
 
@@ -361,7 +364,7 @@ Wie schon einmal erwähnt ist das **ApplicationContext**  ein Sub-Interface von 
     assert Objects.requireNonNull(clientServiceByLocator1).isInstance(ClientService.class);
 ````
 
-Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+Das gesamte Code Beispiel findest du in der Klasse [InstanceFactoryBeanRunner.java](.src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
 
 ## Dependency Injection
 * Constructor-based
@@ -370,8 +373,7 @@ Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationCont
 ### Constructor Argument Resolution
 
 Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments.
-Sind die **<constructor-arg/>** eindeutige, so muss die Reihenfolge Argumente der Bean-Definition
-
+Sind die **<constructor-arg/>** eindeutig, z.B. wenn ein anderes Bean referenziert wird, so muss die Reihenfolge Argumente der Bean-Definition
 ````xml
     <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedBean">
         <constructor-arg ref="springBean1"/>
@@ -391,3 +393,59 @@ public class ConstructorBasedBean {
     }
 }
 ````
+Code Beispiel: [SimpleConstructorBasedRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorBasedRunner.java)
+
+### Constructor argument type matching
+Wenn ein einfacher Typ verwendet wird, wie z.B. <value>true</value>, kann Spring den Typ des Wertes nicht bestimmen und kann daher nicht ohne Hilfe nach Typ abgleichen.
+Der Container kann einfache Typen nur auflösen, wenn diese in der Bean Definition mit dem **type** Attribut angegeben werden.
+
+Diese Auflösung erfolgt über eine Bean Definition
+````xml
+    <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
+        <constructor-arg type="int" value="5000"/>
+        <constructor-arg type="java.lang.String" value="Hallo Zahl"/>
+    </bean>
+````
+und der entsprechenden Deklaration im Konstruktor
+````java
+public class ConstructorBasedTypeMatchingBean {
+    private final int zahl;
+    private final String hello;
+
+    public ConstructorBasedTypeMatchingBean(int zahl, String hello) {
+        this.zahl = zahl;
+        this.hello = hello;
+    }
+}
+````
+Code Beispiel: [SimpleConstructorTypeMatchingRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorTypeMatchingRunner.java)
+
+### Constructor argument index
+Beim Index Konstruktor werden nicht die Typen angegeben, sondern die Indices.
+
+**Der Index beginnt bei 0**.
+````xml
+    <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
+        <constructor-arg index="0" value="5000"/>
+        <constructor-arg index="1" value="Hallo Zahl"/>
+    </bean>
+````
+Code Beispiel: [SimpleConstructorTypeIndexRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorTypeIndexRunner.java)
+
+### Constructor argument name
+Die Argumente können aber auch über die Namen definiert werden
+Dabei spielte die Reihenfolge der Benennung der **constructor-arg** keine Rolle.
+````xml
+    <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
+        <constructor-arg name="zahl" value="5000"/>
+        <constructor-arg name="hello" value="Hallo Zahl"/>
+    </bean>
+````
+Damit sich obiges Beispiel kompilieren lässt, muss der Code mit dem **Debug Flag** kompiliert werden!
+Was aber in Intellij scheinbar default ist.
+
+Wenn man den Code aber nicht mit dem **Debug-Flag** kompilieren will, kann man die **@ConstructorProperties JDK-Annotation** verwenden, um das Konstruktorargumente explizit zu benennen.
+
+Code Beispiel: [SimpleConstructorNameRunner.java](src/main/java/ch/wesr/spring/core/container/xml/SimpleConstructorNameRunner.java)
+
+### Setter based 
