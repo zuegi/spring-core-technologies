@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.xml;
+package ch.wesr.spring.core.container.xml.dependencyinjection;
 
 import ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean;
 import org.springframework.context.ApplicationContext;
