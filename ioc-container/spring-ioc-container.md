@@ -464,10 +464,10 @@ public class ExampleBean {
 
 ### Setter based
 Setter beased Dependency Injection wird erreicht, indem der Container Setter Methoden der Beans aufruft.
-Dazu muss der Container das zu injizierende (to be injected) Bean über einen Konstruktor ohone Argumente oder eine statische Factory Methode ohne Argument instanzieren.
+Dazu muss der Container das zu injizierende (to be injected) Bean über einen Konstruktor ohne Argumente oder eine statische Factory Methode ohne Argument instanzieren.
 
 Zuerst werden beide Beans in der xml Datei definiert.
-Dabei wir dem **setterBasedBean** über ein \<property/> die SpringBean als Referenz erstellt.
+Dabei wird dem **setterBasedBean** über ein \<property/> die SpringBean als Referenz erstellt.
 ````xml
 <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 
