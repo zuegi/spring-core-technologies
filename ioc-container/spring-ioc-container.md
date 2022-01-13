@@ -80,7 +80,7 @@ Konfigurationsmetadaten aus einer Vielzahl von externen Ressourcen zu laden, z. 
 CLASSPATH usw.
 
 ````java
-  ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml","daos.xml");
+ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml","daos.xml");
 ````
 
 Das folgende Beispiel zeigt ein Spring Bean Konfigurations-File (bean-config.xml):
@@ -158,34 +158,46 @@ Konfigurationen gemacht werden kann. Diese Groovy DSL kommt aus dem Grails Frame
 ````
 
 ### Den Container verwenden
-Das ApplicationContext Interface bietet den Zugang zu allen registrierten, erstellten Beans und deren Abhängigkeiten (Dependencies).
-Mit der Methode **T getBean(String name, Class<T> requiredType)** kann eine Instanz des Beans abgerufen werden.
 
-In der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+Das ApplicationContext Interface bietet den Zugang zu allen registrierten, erstellten Beans und deren Abhängigkeiten (
+Dependencies). Mit der Methode **T getBean(String name, Class<T> requiredType)** kann eine Instanz des Beans abgerufen
+werden.
+
+In der
+Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
 wird der Container in der Form des **ClassPathXmlApplicationContext** verwendet.
 
 Im [bean-config.xml](./src/main/resources/bean-config.xml) wird eine Bean konfiguriert.
-```java
-ApplicationContext context = new ClassPathXmlApplicationContext("bean-config.xml");
 
-SpringBean springBean = context.getBean(SpringBean.class);
+```java
+ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml");
+
+SpringBean springBean=context.getBean(SpringBean.class);
 springBean.sayHello();
 ```
-Der Code der Klasse [SpringBean](./src/main/java/ch/wesr/spring/core/container/xml/beans/SpringBean.java) implementiert die Methode **sayHello()**.
 
-Das ApplicationContext Interface verfügt über einige andere Methoden zum Abrufen von Beans, aber im Idealfall sollte dein Anwendungscode diese niemals verwenden. 
-Eigentlich sollte der Applikationscodeüberhaupt keine Aufrufe der getBean()-Methode enthalten und somit überhaupt nicht von Spring-APIs abhängig sein. 
+Der Code der Klasse [SpringBean](./src/main/java/ch/wesr/spring/core/container/xml/beans/SpringBean.java) implementiert
+die Methode **sayHello()**.
 
+Das ApplicationContext Interface verfügt über einige andere Methoden zum Abrufen von Beans, aber im Idealfall sollte
+dein Anwendungscode diese niemals verwenden. Eigentlich sollte der Applikationscodeüberhaupt keine Aufrufe der getBean()
+-Methode enthalten und somit überhaupt nicht von Spring-APIs abhängig sein.
 
 ## Alles über Beans
-Spring Beans werden über den Spring IoC Container verwaltet. Diese Beans werden mit den Metadata Configurations (z.B. über die bean-config.xml) erstellt.
-Innerhalb des Containers werden diese Bean-Definitionen als BeanDefintion-Objekte dargestellt, welche u.a. folgend Angaben besitzen
-* Einen über eine package qualifizierter Klassennamen, meistens die tatsächliche Implementierungsklasse der zu definierenden Bean
+
+Spring Beans werden über den Spring IoC Container verwaltet. Diese Beans werden mit den Metadata Configurations (z.B.
+über die bean-config.xml) erstellt. Innerhalb des Containers werden diese Bean-Definitionen als BeanDefintion-Objekte
+dargestellt, welche u.a. folgend Angaben besitzen
+
+* Einen über eine package qualifizierter Klassennamen, meistens die tatsächliche Implementierungsklasse der zu
+  definierenden Bean
 * Ein Element, welches angibt, wie sich das Bean im Container verhalten soll (Scope, Lifecycle Callbacks, usw)
-* Referenzen zu anderen Beans, welche benötigt werden. Diese Referenzen werden als Collaborators oder Dependencies bezeichnet.
+* Referenzen zu anderen Beans, welche benötigt werden. Diese Referenzen werden als Collaborators oder Dependencies
+  bezeichnet.
 * Andere Konfigurationseinstellungen, die in dem neue erstellen Objekt festgelegt werden soll
 
-Da gibt es eine Tabelle welche diese Metadata Configuration in ein Set von Properties übersetzt, welche jeder Bean Defintion ausmacht.
+Da gibt es eine Tabelle welche diese Metadata Configuration in ein Set von Properties übersetzt, welche jeder Bean
+Defintion ausmacht.
 
 | Property                  | Explained in...         |
 |--------------------------|--------------------------|
@@ -202,123 +214,162 @@ Da gibt es eine Tabelle welche diese Metadata Configuration in ein Set von Prope
 ````text
 TODO Ein Beispiel wie ein ausserhalb des Container erstelltes Objekt registriert wird.
 ````
-Zusätzlich zu den Bean-Definitionen, die Informationen darüber enthalten, wie eine bestimmte Bean zu erstellen ist, 
-erlauben die ApplicationContext-Implementierungen auch die Registrierung bestehender Objekte, die außerhalb des Containers (von Benutzern) erstellt werden. 
-Dies geschieht durch den Zugriff auf die BeanFactory des ApplicationContext über die Methode getBeanFactory(), die die Implementierung der BeanFactory DefaultListableBeanFactory zurückgibt. 
-DefaultListableBeanFactory unterstützt diese Registrierung durch die Methoden registerSingleton(..) und registerBeanDefinition(..). Typische Anwendungen arbeiten jedoch ausschließlich mit Beans, die durch reguläre Bean-Definitions-Metadaten definiert sind.
 
-Bean-Metadaten und manuell bereitgestellte Singleton-Instanzen müssen so früh wie möglich registriert werden, damit der Container sie während des Autowiring und anderer Introspektionsschritte richtig interpretieren kann.
-Während das Überschreiben vorhandener Metadaten und vorhandener Singleton-Instanzen bis zu einem gewissen Grad unterstützt wird, wird die Registrierung neuer Beans zur Laufzeit (gleichzeitig mit dem Live-Zugriff auf die Factory) 
-nicht offiziell unterstützt und kann zu Ausnahmen bei gleichzeitigem Zugriff, zu einem inkonsistenten Zustand im Bean-Container oder zu beidem führen.
+Zusätzlich zu den Bean-Definitionen, die Informationen darüber enthalten, wie eine bestimmte Bean zu erstellen ist,
+erlauben die ApplicationContext-Implementierungen auch die Registrierung bestehender Objekte, die außerhalb des
+Containers (von Benutzern) erstellt werden. Dies geschieht durch den Zugriff auf die BeanFactory des ApplicationContext
+über die Methode getBeanFactory(), die die Implementierung der BeanFactory DefaultListableBeanFactory zurückgibt.
+DefaultListableBeanFactory unterstützt diese Registrierung durch die Methoden registerSingleton(..) und
+registerBeanDefinition(..). Typische Anwendungen arbeiten jedoch ausschließlich mit Beans, die durch reguläre
+Bean-Definitions-Metadaten definiert sind.
 
+Bean-Metadaten und manuell bereitgestellte Singleton-Instanzen müssen so früh wie möglich registriert werden, damit der
+Container sie während des Autowiring und anderer Introspektionsschritte richtig interpretieren kann. Während das
+Überschreiben vorhandener Metadaten und vorhandener Singleton-Instanzen bis zu einem gewissen Grad unterstützt wird,
+wird die Registrierung neuer Beans zur Laufzeit (gleichzeitig mit dem Live-Zugriff auf die Factory)
+nicht offiziell unterstützt und kann zu Ausnahmen bei gleichzeitigem Zugriff, zu einem inkonsistenten Zustand im
+Bean-Container oder zu beidem führen.
 
 ok, bis hierhin ist es eigentlich keine Zusammenfassung sondern eine Übersetzung
 
 ### Beans benennen
+
 Jedes Bean hat einen unique identifier - ob er über das Attribute **id** angegeben wird oder nicht.
 
 Beim Scannen von Komponenten im Klassenpfad generiert Spring Bean-Namen für unbenannte Komponenten und folgt den Regeln:
-* Im Wesentlichen wird der einfache Klassenname genommen und sein erstes Zeichen in einen Kleinbuchstaben umgewandelt.
-* In dem (ungewöhnlichen) Sonderfall, dass es mehr als ein Zeichen gibt und sowohl das erste als auch das zweite Zeichen Großbuchstaben sind,
-wird die ursprüngliche Schreibweise beibehalten. 
-* Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier verwendet).
 
-Bean Konfiguration mit einer eindeutigen Id und 2 Aliases, separiert durch ein Komma und zugehörigen validen Aufrufen im Code
+* Im Wesentlichen wird der einfache Klassenname genommen und sein erstes Zeichen in einen Kleinbuchstaben umgewandelt.
+* In dem (ungewöhnlichen) Sonderfall, dass es mehr als ein Zeichen gibt und sowohl das erste als auch das zweite Zeichen
+  Großbuchstaben sind, wird die ursprüngliche Schreibweise beibehalten.
+* Dies sind die gleichen Regeln, wie sie in java.beans.Introspector.decapitalize definiert sind (die Spring hier
+  verwendet).
+
+Bean Konfiguration mit einer eindeutigen Id und 2 Aliases, separiert durch ein Komma und zugehörigen validen Aufrufen im
+Code
+
 ````xml
 <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 ````
+
 ````java
-SpringBean springBean = context.getBean(SpringBean.class);
+SpringBean springBean=context.getBean(SpringBean.class);
 // oder
-SpringBean springBean = (SpringBean) context.getBean("springBean");
+SpringBean springBean=(SpringBean)context.getBean("springBean");
 // oder
-SpringBean springBean1 = (SpringBean) context.getBean("customBean");
+SpringBean springBean1=(SpringBean)context.getBean("customBean");
 // oder
-SpringBean springBean2 = (SpringBean) context.getBean("dedicatedBean");
+SpringBean springBean2=(SpringBean)context.getBean("dedicatedBean");
 ````
 
 Bean Konfiguration ohne definierte id oder name Attribut
+
 ````xml
 <bean class="ch.wesr.spring.core.container.xml.beans.SpringBean2"/>
 ````
+
 ````java
-SpringBean2 springBean2 = context.getBean(SpringBean2.class);
+SpringBean2 springBean2=context.getBean(SpringBean2.class);
 ````
 
-Bean Konfiguration mit Sonderzeichen: Wenn auch üblich oder konventionell ist, dass die Namen der Attributte **alphanumerisch**, meistens mit einem **Kleinbuchstaben** und in **CamelCase** ('sprinBean', 'myBean') geschrieben sind,
+Bean Konfiguration mit Sonderzeichen: Wenn auch üblich oder konventionell ist, dass die Namen der Attributte **
+alphanumerisch**, meistens mit einem **Kleinbuchstaben** und in **CamelCase** ('sprinBean', 'myBean') geschrieben sind,
 können die Attribute _id_ und _name_ auch **Sonderzeichen** enthalten sowie mit **,** oder **;** unterteilt werden.
+
 ````xml
+
 <bean id="$$*ç%" class="ch.wesr.spring.core.container.xml.beans.SpringBean3"/>
 ````
+
 ````java
-SpringBean3 springBean2 = context.getBean("spring-Bean$3");
+SpringBean3 springBean2=context.getBean("spring-Bean$3");
 ````
 
-Bean Konfiguration ohne _id_ Attribut, kann über eines der Aliase aufgerufen werden, auch wenn dieses Sonderzeichen enthält.
+Bean Konfiguration ohne _id_ Attribut, kann über eines der Aliase aufgerufen werden, auch wenn dieses Sonderzeichen
+enthält.
+
 ````xml
 <bean name="schnullifax;%ç*$$" class="ch.wesr.spring.core.container.xml.beans.SpringBean5"/>
 ````
+
 ````java
-SpringBean5 springBean5 = (SpringBean5) context.getBean("%ç*$$");
+SpringBean5 springBean5=(SpringBean5)context.getBean("%ç*$$");
 ````
+
 **Warum gibt es die Möglichkeit einem Bean Aliases zu definieren?**
 
-In einer Bean-Definition selbst kann man mehr als einen Namen für die Bean angeben. Dies geschieht mit einer Kombination aus einem **id** Attribut und einer beliebigen Anzahl **Aliases**.
-Diese Namen können äquivalente Aliase für dieselbe Bean sein und sind in einigen Situationen nützlich, wie z.B. wenn jede Komponente in einer Anwendung auf eine gemeinsame Abhängigkeit verweisen soll, indem ein Bean-Name verwendet wird, der spezifisch für diese Komponente selbst ist.
+In einer Bean-Definition selbst kann man mehr als einen Namen für die Bean angeben. Dies geschieht mit einer Kombination
+aus einem **id** Attribut und einer beliebigen Anzahl **Aliases**. Diese Namen können äquivalente Aliase für dieselbe
+Bean sein und sind in einigen Situationen nützlich, wie z.B. wenn jede Komponente in einer Anwendung auf eine gemeinsame
+Abhängigkeit verweisen soll, indem ein Bean-Name verwendet wird, der spezifisch für diese Komponente selbst ist.
 
 ##### Aliasing a Bean outside the Bean Definition
-Die Angabe aller Aliase an den Stellen, an denen die Bean tatsächlich definiert ist, ist jedoch nicht immer ausreichend. 
-Manchmal ist es wünschenswert, einen Alias für eine Bean einzuführen, die an anderer Stelle definiert ist. 
-Dies ist häufig in großen Systemen der Fall, in denen die Konfiguration auf die einzelnen Subsysteme aufgeteilt ist, wobei jedes Subsystem seinen eigenen Satz von Objektdefinitionen hat.
+
+Die Angabe aller Aliase an den Stellen, an denen die Bean tatsächlich definiert ist, ist jedoch nicht immer ausreichend.
+Manchmal ist es wünschenswert, einen Alias für eine Bean einzuführen, die an anderer Stelle definiert ist. Dies ist
+häufig in großen Systemen der Fall, in denen die Konfiguration auf die einzelnen Subsysteme aufgeteilt ist, wobei jedes
+Subsystem seinen eigenen Satz von Objektdefinitionen hat.
 
 ````xml
+
 <alias name="customBean1" alias="subsystemA-customBean1"/>
 <alias name="customBean1" alias="subsystemB-customBean1"/>
 ````
+
 ```java
-SpringBean1 subsystemACustomBean1 = (SpringBean1) context.getBean("subsystemA-customBean1");
+SpringBean1 subsystemACustomBean1=(SpringBean1)context.getBean("subsystemA-customBean1");
 subsystemACustomBean1.sayHelloFrom();
 
-SpringBean1 subsystemBCustomBean1 = (SpringBean1) context.getBean("subsystemB-customBean1");
+SpringBean1 subsystemBCustomBean1=(SpringBean1)context.getBean("subsystemB-customBean1");
 subsystemBCustomBean1.sayHelloFrom();
 ```
-Wichtig dabei ist zu wissen, dass sich trotzdem immer um dasselbe Bean handelt.
-Darum wird dieser Mechanismus oftmals bei Datsourcen verwendet, bei welchem ein Bean die Datenbankverbindung erstellt und in verschiedenen Sub-Modulen einer Applikation verwendet wird.
+
+Wichtig dabei ist zu wissen, dass sich trotzdem immer um dasselbe Bean handelt. Darum wird dieser Mechanismus oftmals
+bei Datsourcen verwendet, bei welchem ein Bean die Datenbankverbindung erstellt und in verschiedenen Sub-Modulen einer
+Applikation verwendet wird.
+
 ```text
 Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
 Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@62fdb4a6
 ```
-Das gesamte Code Beispiele findest du in der Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+
+Das gesamte Code Beispiele findest du in der
+Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
 
 ### Beans instanzieren
-Eine Bean Definition erzeugt eines oder mehrere Objekte.
-In XML-basierten Konfigurationsmetadaten, gibt man den Typ (oder die Klasse) des Objekts, das instanziiert werden soll, im **class** Attribut des **<bean/>** Elements an. 
-Dieses **class** Attribut (das intern eine Class-Eigenschaft einer BeanDefinition-Instanz ist) ist normalerweise obligatorisch.
+
+Eine Bean Definition erzeugt eines oder mehrere Objekte. In XML-basierten Konfigurationsmetadaten, gibt man den Typ (
+oder die Klasse) des Objekts, das instanziiert werden soll, im **class** Attribut des **<bean/>** Elements an. Dieses **
+class** Attribut (das intern eine Class-Eigenschaft einer BeanDefinition-Instanz ist) ist normalerweise obligatorisch.
 Nur wenn man eine Factory Bean Methode verwendet ist dieses class Attribut hinfällig.
 
 Es gibt 2 verschiedene Arten wie man ein Bean instanzieren kann.
 
 **Wenn der Konstruktor reflektiv durch den Container aufgerufen wird.**
+
 ````xml
 <bean id="springBean" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 ````
-````java
-ApplicationContext context = new ClassPathXmlApplicationContext("bean-config.xml");
 
-SpringBean springBean = context.getBean(SpringBean.class);
+````java
+ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml");
+
+SpringBean springBean=context.getBean(SpringBean.class);
 ````
+
 Code unter: [InstantiatingBeanRunner.java](src/main/java/ch/wesr/spring/core/container/xml/InstantiatingBeanRunner.java)
 
-**Wenn die zu instanzierende Klasse eine static Factory Method besitzt.** 
+**Wenn die zu instanzierende Klasse eine static Factory Method besitzt.**
 
 ```xml
-<bean id="springBeanService" 
-      class="ch.wesr.spring.core.container.xml.beans.SpringBeanService" 
+
+<bean id="springBeanService"
+      class="ch.wesr.spring.core.container.xml.beans.SpringBeanService"
       factory-method="erstelleSpringBeanService"/>
 ```
+
 ````java
-ApplicationContext context = new ClassPathXmlApplicationContext("bean-config.xml");
-SpringBeanService springBeanService = context.getBean(SpringBeanService.class);
+ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml");
+SpringBeanService springBeanService=context.getBean(SpringBeanService.class);
 springBeanService.sayHello();
 ````
 
@@ -326,14 +377,20 @@ springBeanService.sayHello();
 
 Zuerst muss man natürlich die Factory Bean konfigurieren.
 
-**Achtung:** Dieses Factory Bean bezieht sich auf ein Bean, welches im Container konfiguriert und über den Konstruktor oder eine statische factor method erzeugt wurde.
-Im Kontrast zu einem **FactoryBean**, welches eine **Spring-spezfische Implementierungsklasse** ist.
+**Achtung:** Dieses Factory Bean bezieht sich auf ein Bean, welches im Container konfiguriert und über den Konstruktor
+oder eine statische factor method erzeugt wurde. Im Kontrast zu einem **FactoryBean**, welches eine **Spring-spezfische
+Implementierungsklasse** ist.
+
 ````xml
+
 <bean id="serviceLocator" class="ch.wesr.spring.core.container.xml.beans.DefaultServiceLocator"/>
 ````
-Danach kann in der Konfiguration das **class** Attribut weggelassen werden.
-Zudem ist es auch möglich in einer Factory Bean mehrere Instanzen von verschiedenen Objekten zu erzeugen.
+
+Danach kann in der Konfiguration das **class** Attribut weggelassen werden. Zudem ist es auch möglich in einer Factory
+Bean mehrere Instanzen von verschiedenen Objekten zu erzeugen.
+
 ```xml
+
 <bean id="springBeanServiceByLocator"
       factory-bean="serviceLocator"
       factory-method="erstelleSpringBeanService"/>
@@ -342,72 +399,92 @@ Zudem ist es auch möglich in einer Factory Bean mehrere Instanzen von verschied
       factory-bean="serviceLocator"
       factory-method="erstelleClientService"/>
 ```
+
 ````java
-SpringBeanService1 springBeanService1 = context.getBean(SpringBeanService1.class);
+SpringBeanService1 springBeanService1=context.getBean(SpringBeanService1.class);
 springBeanService1.sayHello();
 
-ClientService clientService = context.getBean(ClientService.class);
-lientService.sayHello();
+ClientService clientService=context.getBean(ClientService.class);
+clientService.sayHello();
 ````
+
 **Wie kann ich den Typ einer Bean herausfinden?**
 
-Der empfohlene Weg, um den tatsächlichen Laufzeittyp einer bestimmten Bean herauszufinden, ist ein BeanFactory.getType-Aufruf für den angegebenen Bean-Namen. 
-Dabei werden alle oben genannten Fälle berücksichtigt und der Objekttyp zurückgegeben, den ein BeanFactory.getBean-Aufruf für denselben Bean-Namen zurückgeben wird.
+Der empfohlene Weg, um den tatsächlichen Laufzeittyp einer bestimmten Bean herauszufinden, ist ein
+BeanFactory.getType-Aufruf für den angegebenen Bean-Namen. Dabei werden alle oben genannten Fälle berücksichtigt und der
+Objekttyp zurückgegeben, den ein BeanFactory.getBean-Aufruf für denselben Bean-Namen zurückgeben wird.
 
 Wie schon einmal erwähnt ist das **ApplicationContext**  ein Sub-Interface von **BeanFactory**
+
 ````java
-String clientServiceByLocator = context.getType("clientServiceByLocator").getName();
+String clientServiceByLocator=context.getType("clientServiceByLocator").getName();
 assert clientServiceByLocator.equals("ch.wesr.spring.core.container.xml.beans.ClientService");
-System.out.println("Type of bean: " +clientServiceByLocator);
+System.out.println("Type of bean: "+clientServiceByLocator);
 // oder
-Class<?> clientServiceByLocator1 = context.getType("clientServiceByLocator");
+Class<?> clientServiceByLocator1=context.getType("clientServiceByLocator");
 assert Objects.requireNonNull(clientServiceByLocator1).isInstance(ClientService.class);
 ````
 
-Das gesamte Code Beispiel findest du in der Klasse [InstanceFactoryBeanRunner.java](.src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
+Das gesamte Code Beispiel findest du in der
+Klasse [InstanceFactoryBeanRunner.java](.src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
 
 ## Dependency Injection
+
 * Constructor-based
 * Setter-based
 
 ### Constructor-based
+
 #### Constructor Argument Resolution
 
-Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments.
-Sind die **<constructor-arg/>** eindeutig, z.B. wenn ein anderes Bean referenziert wird, so muss die Reihenfolge Argumente der Bean-Definition
+Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments. Sind die **<constructor-arg/>** eindeutig, z.B.
+wenn ein anderes Bean referenziert wird, so muss die Reihenfolge Argumente der Bean-Definition
+
 ````xml
+
 <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedBean">
     <constructor-arg ref="springBean1"/>
-    <constructor-arg ref="springBean"/> <-- in untenstehendem Konstruktor ist die Defintion des SpringBean an erster Stelle
+    <constructor-arg ref="springBean"/>
+    <-- in untenstehendem Konstruktor ist die Defintion des SpringBean an erster Stelle
 </bean>
 
 <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 
 <bean id="springBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
 ````
+
 und die Reihenfolge der Argumente im Konstruktor nicht übereinstimmen.
+
 ````java
 public class ConstructorBasedBean {
-    
+
     public ConstructorBasedBean(SpringBean springBean, SpringBean1 springBean1) {
         // ...
     }
 }
 ````
-Code Beispiel: [SimpleConstructorBasedRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorBasedRunner.java)
+
+Code
+Beispiel: [SimpleConstructorBasedRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorBasedRunner.java)
 
 #### Constructor argument type matching
-Wenn ein einfacher Typ verwendet wird, wie z.B. \<value>true\</value>, kann Spring den Typ des Wertes nicht bestimmen und kann daher nicht ohne Hilfe nach Typ abgleichen.
-Der Container kann einfache Typen nur auflösen, wenn diese in der Bean Definition mit dem **type** Attribut angegeben werden.
+
+Wenn ein einfacher Typ verwendet wird, wie z.B. \<value>true\</value>, kann Spring den Typ des Wertes nicht bestimmen
+und kann daher nicht ohne Hilfe nach Typ abgleichen. Der Container kann einfache Typen nur auflösen, wenn diese in der
+Bean Definition mit dem **type** Attribut angegeben werden.
 
 Diese Auflösung erfolgt über eine Bean Definition
+
 ````xml
+
 <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
     <constructor-arg type="int" value="5000"/>
     <constructor-arg type="java.lang.String" value="Hallo Zahl"/>
 </bean>
 ````
+
 und der entsprechenden Deklaration im Konstruktor
+
 ````java
 public class ConstructorBasedTypeMatchingBean {
     private final int zahl;
@@ -419,64 +496,134 @@ public class ConstructorBasedTypeMatchingBean {
     }
 }
 ````
-Code Beispiel: [SimpleConstructorTypeMatchingRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeMatchingRunner.java)
+
+Code
+Beispiel: [SimpleConstructorTypeMatchingRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeMatchingRunner.java)
 
 #### Constructor argument index
+
 Beim Index Konstruktor werden nicht die Typen angegeben, sondern die Indices.
 
 **Der Index beginnt bei 0**.
+
 ````xml
+
 <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
     <constructor-arg index="0" value="5000"/>
     <constructor-arg index="1" value="Hallo Zahl"/>
 </bean>
 ````
-Code Beispiel: [SimpleConstructorTypeIndexRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeIndexRunner.java)
+
+Code
+Beispiel: [SimpleConstructorTypeIndexRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeIndexRunner.java)
 
 #### Constructor argument name
-Die Argumente können aber auch über die Namen definiert werden
-Dabei spielte die Reihenfolge der Benennung der **constructor-arg** keine Rolle.
+
+Die Argumente können aber auch über die Namen definiert werden Dabei spielte die Reihenfolge der Benennung der **
+constructor-arg** keine Rolle.
+
 ````xml
+
 <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
     <constructor-arg name="zahl" value="5000"/>
     <constructor-arg name="hello" value="Hallo Zahl"/>
 </bean>
 ````
+
 Damit sich obiges Beispiel kompilieren lässt, muss der Code mit dem **Debug Flag** kompiliert werden!
 Was aber in Intellij scheinbar default ist.
 
-Wenn man den Code aber nicht mit dem **Debug-Flag** kompilieren will, kann man die **@ConstructorProperties JDK-Annotation** verwenden, um das Konstruktorargumente explizit zu benennen.
+Wenn man den Code aber nicht mit dem **Debug-Flag** kompilieren will, kann man die **@ConstructorProperties
+JDK-Annotation** verwenden, um das Konstruktorargumente explizit zu benennen.
 
-Code Beispiel: [SimpleConstructorNameRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorNameRunner.java)
+Code
+Beispiel: [SimpleConstructorNameRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorNameRunner.java)
 
 ## TODO @ConstructorProperties Beispiel
 
 ````java
 public class ExampleBean {
-      // Fields omitted
-      @ConstructorProperties({"years", "ultimateAnswer"})
-      public ExampleBean(int years, String ultimateAnswer) {
-          this.years = years;
-          this.ultimateAnswer = ultimateAnswer;
-      }
+    // Fields omitted
+    @ConstructorProperties({"years", "ultimateAnswer"})
+    public ExampleBean(int years, String ultimateAnswer) {
+        this.years = years;
+        this.ultimateAnswer = ultimateAnswer;
+    }
 }
 ````
 
 ### Setter based
-Setter beased Dependency Injection wird erreicht, indem der Container Setter Methoden der Beans aufruft.
-Dazu muss der Container das zu injizierende (to be injected) Bean über einen Konstruktor ohne Argumente oder eine statische Factory Methode ohne Argument instanzieren.
 
-Zuerst werden beide Beans in der xml Datei definiert.
-Dabei wird dem **setterBasedBean** über ein \<property/> die SpringBean als Referenz erstellt.
+Setter beased Dependency Injection wird erreicht, indem der Container Setter Methoden der Beans aufruft. Dazu muss der
+Container das zu injizierende (to be injected) Bean über einen Konstruktor ohne Argumente oder eine statische Factory
+Methode ohne Argument instanzieren.
+
+Zuerst werden beide Beans in der xml Datei definiert. Dabei wird dem **setterBasedBean** über ein \<property/> die
+SpringBean als Referenz mitgegeben.
+
 ````xml
+
 <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
 
 <bean id="setterBasedBean" class="ch.wesr.spring.core.container.xml.beans.SetterBasedBean">
-    <property name="springBean" ref="springBean"/>
+<property name="springBean" ref="springBean"/>
 </bean>
 ````
 
 Das SetterBean selber ist eine ganz einfache Pojo Klasse ohne Firlefanz.
+
+````java
+public class SetterBasedBean {
+
+    // SetterBased Bean hat eine Dependency zu SpringBean
+    private SpringBean springBean;
+
+    // eine Setter Methode, sodass der Container die SpringBean injecten kann
+    public void setSpringBean(SpringBean springBean) {
+        this.springBean = springBean;
+        System.out.println("springBean wurde gesetzt in " + this.getClass().getName());
+    }
+
+    public void sayHello() {
+        springBean.sayHello();
+    }
+}
+````
+
+Wie gewohnt kann über den ApplicationContext die SetterBaseBean aufgerufen werden.
+
+```java
+ApplicationContext context=new ClassPathXmlApplicationContext("setter-based.xml");
+
+SetterBasedBean bean=context.getBean(SetterBasedBean.class);
+bean.sayHello();
+```
+
+Code
+Beispiel: [SimpleSetterDIRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleSetterDIRunner.java)
+
+### Constructor oder Setter based Dependency Injection
+
+Obwohl es möglich ist constructor-based und setter-based Dependency Injection zu kombinieren/mischen ist es ein gute
+Gewohnheit constructor-based DI für zwingende Abhängigkeiten zu verwenden. Während dem die setter-based Variante eher
+für optional DI verwendet wird.
+
+Die **Constructor-based** Varianten (ohne Argumente) lässt Komponenten/Beans als immutable Objects verwenden und werden
+immer zum Caller zurückgegeben. Diese Variante mit (zu vielen) Argumenten zu verwenden, lässt nicht nur die Immutability
+verschwinden sondern ist auch eine schlechte Code Variante. Besonders bei (third-party) Klassen, von welchen man den
+Source Code nicht besitzt ist die constructor-based Variante ohne Argumente von Vorteil.
+
+Die **Setter-based** Variante sollte vor allem für optionale Abhängigkeiten, welche im Sinne einer Konfiguration verwendet,
+gesetzt werden. Dabei muss beachtet werden, dass bei Verwendung der optionale Abhängigkeit immer ein **null-check**
+gemacht werden muss, bevor die Abhängigkeit verwendet wird.
+````xml
+
+<bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+<bean id="setterBasedBean" class="ch.wesr.spring.core.container.xml.beans.SetterBasedBean">
+<!-- Die springBean wird zwar deklariert, aber nicht als Referenz der setterbaseBean übergeben -->
+</bean>
+````
+
 ````java
 public class SetterBasedBean {
 
@@ -490,21 +637,54 @@ public class SetterBasedBean {
     }
 
     public void sayHello() {
-        springBean.sayHello();
+        Objects.requireNonNull(springBean, "Achtung! Wenn die SpringBean optional verwendet wird, muss sie auf null-check geprüft werden.").sayHello();
     }
 }
 ````
+Der entsprechende Aufruf 
+````java
+public class SimpleSetterOptionalDIRunner {
 
-Wie gewohnt kann über den ApplicationContext die SetterBaseBean aufgerufen werden.
-```java
-ApplicationContext context = new ClassPathXmlApplicationContext("setter-based.xml");
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("setter-based-optional.xml");
 
-SetterBasedBean bean = context.getBean(SetterBasedBean.class);
-bean.sayHello();
-```
-Code Beispiel: [SimpleSetterDIRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleSetterDIRunner.java)
+        SetterBasedBean bean = context.getBean(SetterBasedBean.class);
+        bean.sayHello();
+    }
+}
+````
+resultiert dann in einer Null-Pointer Exception
+````text
+Exception in thread "main" java.lang.NullPointerException: Achtung! Wenn die SpringBean optional verwendet wird, muss sie auf null-check geprüft werden.
+	at java.base/java.util.Objects.requireNonNull(Objects.java:247)
+	at ch.wesr.spring.core.container.xml.beans.SetterBasedBean.sayHello(SetterBasedBean.java:17)
+	at ch.wesr.spring.core.container.xml.dependencyinjection.SimpleSetterOptionalDIRunner.main(SimpleSetterOptionalDIRunner.java:13)
+````
 
-### Constructor oder Setter based Dependency Injection
+Code Beispiel [SimpleSetterOptionalDIRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleSetterOptionalDIRunner.java)
+
+#Frage: Wie kann ich zur Laufzeit entscheiden ob der Setter injected werden soll oder nicht?
+
+### Der Dependency Resolution (Auflösung) Process
+Der Container (ApplicationContext) löst die Bean Abhängigkeiten folgendermassen aus.
+
+* Der ApplicationContext wird erstellt und initalisiert alle Beans über die Metadata-Konfiguration (xml, Java Code oder Annotations).
+* Beim Erstellen einer Bean werden die Abhängigkeiten übergeben und definiert über eine der folgenden Möglichkeiten. 
+  * Properties **\<property name="springBean" ref="springBean"/>**
+  * Constructor Argumente  **<constructor-arg ref="springBean"/>**
+  * static Factory **<bean id="springBeanService" class="ch.wesr.spring.core.container.xml.beans.SpringBeanService "factory-method="erstelleSpringBeanService"/>**
+* Jedes Property oder Constructor Argument ist eine Defintion eines Wertes oder eine Referenz zu eine anderen Bean der/die gesetzt werden muss
+* Jedes Property oder  Constructor Argument, das ein Wert ist, wird von seinem angegebenen Format in den tatsächlichen Typ dieser Eigenschaft oder dieses Konstruktorarguments konvertiert. 
+  Standardmäßig kann Spring einen Wert, der im String-Format übergeben wird, in alle eingebauten Typen konvertieren, wie int, long, String, boolean und so weiter.
+
+Beim Erstellen des Spring Container wird jede Konfiguration einer Bean geprüft. Die Bean Properties werden aber erst beim Erstellen der Bean effektiv gesetzt.
+Dies gilt es zu beachten obwohl der Default Zustand einer Bean ein Singleton-Scope ist und diese Singleton Beans ebenfalls beim Erstellen des Containers erzeugt werden.
+
+Ansonsten gilt, das Bean wird erst erzeugt, wenn es angefordert (requested) wird und eben dann, beim Erstellen der Bean, werden die Properties gesetzt.
+Die Erstellung einer Bean führt potenziell zur Erstellung eines Graphen von Beans, da die Abhängigkeiten der Bean und die Abhängigkeiten ihrer Abhängigkeiten (und so weiter) erstellt und zugewiesen werden. 
+Achtung: Fehler beim Auflösen solcher Abhängigkeiten können erst spät auftauchen, nämlkich dann wenn die betroffenen Beans erstellt werden.
+
+### Circular Dependencies
 
 ## to be completed
 
