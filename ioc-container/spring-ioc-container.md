@@ -685,6 +685,93 @@ Die Erstellung einer Bean führt potenziell zur Erstellung eines Graphen von Bea
 Achtung: Fehler beim Auflösen solcher Abhängigkeiten können erst spät auftauchen, nämlkich dann wenn die betroffenen Beans erstellt werden.
 
 ### Circular Dependencies
+Bei überwiegend verwendeten Constructor-based DI kann es sein, dass man sich unauflösbare, zirkuläre Abhängigkeiten schafft.
+
+Zum Beispiel: Klasse A benötigt eine Instanz von Klasse B durch Konstruktorinjektion, und Klasse B benötigt eine Instanz von Klasse A durch Konstruktorinjektion. Wenn Sie Beans für die Klassen A und B so konfigurieren, dass sie ineinander injiziert werden, erkennt der Spring IoC-Container diese zirkuläre Referenz zur Laufzeit und löst eine BeanCurrentlyInCreationException aus.
+Eine mögliche Lösung besteht darin, den Quellcode einiger Klassen so zu bearbeiten, dass sie über Setter und nicht über Konstruktoren konfiguriert werden. Alternativ dazu kann man die Konstruktorinjektion vermeiden und nur die Setterinjektion verwenden. Mit anderen Worten, obwohl es nicht empfohlen wird, können Sie zirkuläre Abhängigkeiten mit Setter-Injection konfigurieren.
+Im Gegensatz zum typischen Fall (ohne zirkuläre Abhängigkeiten) zwingt eine zirkuläre Abhängigkeit zwischen Bean A und Bean B dazu, dass eine der Beans in die andere injiziert wird, bevor sie selbst vollständig initialisiert ist (ein klassisches Huhn-und-Ei-Szenario).
+
+
+### Dependencies and Configuration
+Bean-Eigenschaften und Konstruktorargumente können als Referenzen auf andere verwaltete Beans (Collaborators) oder als inline definierte Werte definiert werden. 
+Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zweck Unterelementtypen innerhalb ihrer <property/>- und <constructor-arg/>-Elemente.
+
+**Straight Values (Primitives, Strings, ...)**
+Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
+Der Spring *conversion service* konvertiert dann diese Werte aus einem String in den effektiv verwendeten Typ.
+
+Dabei werde die \<property/> Elemente bzw. deren Werte über die Setter Methoden in das Bean überführt.
+
+````xml
+<bean id="dataSource" class="ch.wesr.spring.core.container.xml.beans.BasicDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+    <property name="url" value="jdbc:mysql:://localhost:3306/myDatabase"/>
+    <property name="username" value="hans"/>
+    <property name="password" value="muster"/>
+</bean>
+````
+````java
+public class BasicDataSource {
+
+    private String driverClassName;
+    private String url;
+    private String username;
+    private String password;
+    
+    public void setDriverClassName(String driverClassName) {
+        this.driverClassName = driverClassName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void sayHello() {
+        System.out.println("Hello "+getUsername() +", du verbindest dich mit " +getUrl());
+    }
+}
+````
+
+Code Beispiel: [SimpleDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleDataSource.java)
+
+Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
+
+Beachte die Verwendung des *Schema p* **xmlns:p="http://www.springframework.org/schema/p"**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="ch.wesr.spring.core.container.xml.beans.BasicDataSource"
+        p:driverClassName="com.mysql.jdbc.Driver"
+        p:url="jdbc:mysql:://localhost:3306/myDatabase"
+        p:username="hans"
+        p:password="muster"
+    />
+</beans>
+```
+Verwendet man für den p-namespace eine IDE wie IntelliJ wrid man dabei auch wunderbar unterstützt und die Gefahr auf Schreibfehler vermindert sich massiv.
+
+
+java.util.Properties verwwenden?
 
 ## to be completed
 
