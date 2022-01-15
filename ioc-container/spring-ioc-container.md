@@ -768,11 +768,20 @@ Beachte die Verwendung des *Schema p* **xmlns:p="http://www.springframework.org/
     />
 </beans>
 ```
-Verwendet man für den p-namespace eine IDE wie IntelliJ wrid man dabei auch wunderbar unterstützt und die Gefahr auf Schreibfehler vermindert sich massiv.
+Verwendet man für den p-namespace eine IDE wie IntelliJ wird man dabei auch wunderbar unterstützt und die Gefahr auf Schreibfehler vermindert sich massiv.
 
 Code Beispiel: [SimplePDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePDataSource.java)
 
-java.util.Properties verwwenden?
+# TODO java.util.Properties verwwenden?
+Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-source-placeholder.xml)
+
+Das Code Beispiel erstellt - habe ich aber noch nicht verstanden und funktioniert deshalb noch nicht.
+Code Beispiel [SimplePropertiesDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePropertiesDataSource.java)
+
+Das **idref** Element
+
+Das *idref* Element wird verwendet um die Id eines Beans einem anderen Bean als String zur Verfügung zu stellen.
+[idref Beispiel](doc/dependencies/idref.md)
 
 ## to be completed
 

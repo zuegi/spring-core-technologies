@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean name="justAnotherBean" class="ch.wesr.spring.core.container.xml.beans.JustAnotherBean">
+    </bean>
+
+    <bean name="simpleIdRefBean" class="ch.wesr.spring.core.container.xml.beans.IdRefBean">
+        <property name="irgendEinString">
+            <idref bean="justAnotherBean" />
+        </property>
+    </bean>
+
+</beans>
