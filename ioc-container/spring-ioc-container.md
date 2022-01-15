@@ -506,7 +506,7 @@ Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zwe
 Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
 Der Spring *conversion service* konvertiert dann diese Werte aus einem String in den effektiv verwendeten Typ.
 
-### [Verwendung des p-namespace aus dem Spring Schema]()
+#### [Verwendung des p-namespace aus dem Spring Schema]()
 Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
 
 # TODO java.util.Properties verwenden?
@@ -515,10 +515,9 @@ Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-so
 Das Code Beispiel erstellt - habe ich aber noch nicht verstanden und funktioniert deshalb noch nicht.
 Code Beispiel [SimplePropertiesDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePropertiesDataSource.java)
 
-Das **idref** Element
-
+#### [Das idref Element](doc/dependencies/configurations/idref.md)
 Das *idref* Element wird verwendet um die Id eines Beans einem anderen Bean als String zur Verfügung zu stellen.
-[idref Beispiel](doc/dependencies/idref.md)
+
 
 ## to be completed
 
