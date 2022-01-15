@@ -694,7 +694,7 @@ Im Gegensatz zum typischen Fall (ohne zirkuläre Abhängigkeiten) zwingt eine zi
 
 ### Dependencies and Configuration
 Bean-Eigenschaften und Konstruktorargumente können als Referenzen auf andere verwaltete Beans (Collaborators) oder als inline definierte Werte definiert werden. 
-Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zweck Unterelementtypen innerhalb ihrer <property/>- und <constructor-arg/>-Elemente.
+Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zweck Unterelementtypen innerhalb ihrer \<property/>- und \<constructor-arg/>-Elemente.
 
 **Straight Values (Primitives, Strings, ...)**
 Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
