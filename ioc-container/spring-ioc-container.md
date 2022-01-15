@@ -502,81 +502,12 @@ Im Gegensatz zum typischen Fall (ohne zirkuläre Abhängigkeiten) zwingt eine zi
 Bean-Eigenschaften und Konstruktorargumente können als Referenzen auf andere verwaltete Beans (Collaborators) oder als inline definierte Werte definiert werden. 
 Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zweck Unterelementtypen innerhalb ihrer \<property/>- und \<constructor-arg/>-Elemente.
 
-**Straight Values (Primitives, Strings, ...)**
+#### [Straight Values (Primitives, Strings)](doc/dependencies/configurations/straight_values.md)
 Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
 Der Spring *conversion service* konvertiert dann diese Werte aus einem String in den effektiv verwendeten Typ.
 
-Dabei werde die \<property/> Elemente bzw. deren Werte über die Setter Methoden in das Bean überführt.
-
-````xml
-<bean id="dataSource" class="ch.wesr.spring.core.container.xml.beans.BasicDataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="jdbc:mysql:://localhost:3306/myDatabase"/>
-    <property name="username" value="hans"/>
-    <property name="password" value="muster"/>
-</bean>
-````
-````java
-public class BasicDataSource {
-
-    private String driverClassName;
-    private String url;
-    private String username;
-    private String password;
-    
-    public void setDriverClassName(String driverClassName) {
-        this.driverClassName = driverClassName;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void sayHello() {
-        System.out.println("Hello "+getUsername() +", du verbindest dich mit " +getUrl());
-    }
-}
-````
-
-Code Beispiel: [SimpleDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleDataSource.java)
-
+### [Verwendung des p-namespace aus dem Spring Schema]()
 Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
-
-Beachte die Verwendung des *Schema p* **xmlns:p="http://www.springframework.org/schema/p"**
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <bean id="dataSource" class="ch.wesr.spring.core.container.xml.beans.BasicDataSource"
-        p:driverClassName="com.mysql.jdbc.Driver"
-        p:url="jdbc:mysql:://localhost:3306/myDatabase"
-        p:username="hans"
-        p:password="muster"
-    />
-</beans>
-```
-Verwendet man für den p-namespace eine IDE wie IntelliJ wird man dabei auch wunderbar unterstützt und die Gefahr auf Schreibfehler vermindert sich massiv.
-
-Code Beispiel: [SimplePDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePDataSource.java)
 
 # TODO java.util.Properties verwenden?
 Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-source-placeholder.xml)
