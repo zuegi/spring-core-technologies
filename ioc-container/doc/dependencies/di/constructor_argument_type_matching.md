@@ -31,4 +31,4 @@ public class ConstructorBasedTypeMatchingBean {
 Code
 Beispiel: [SimpleConstructorTypeMatchingRunner.java](../../../src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/constructorbased/SimpleConstructorTypeMatchingRunner.java)
 
-###[zurück zu spring-ioc-container](../../../spring-ioc-container.md)
+### [zurück zu spring-ioc-container](../../../spring-ioc-container.md)
