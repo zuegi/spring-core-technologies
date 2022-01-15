@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.xml.dependencyinjection;
+package ch.wesr.spring.core.container.xml.dependencyinjection.setterbased;
 
 import ch.wesr.spring.core.container.xml.beans.BasicDataSource;
 import org.springframework.context.ApplicationContext;

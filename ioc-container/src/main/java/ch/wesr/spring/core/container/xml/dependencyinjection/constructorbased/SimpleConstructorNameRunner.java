@@ -1,14 +1,14 @@
-package ch.wesr.spring.core.container.xml.dependencyinjection;
+package ch.wesr.spring.core.container.xml.dependencyinjection.constructorbased;
 
 import ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SimpleConstructorTypeIndexRunner {
+public class SimpleConstructorNameRunner {
 
     public static void main(String[] args) {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("constructor-based-type-matching.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("constructorbased/constructor-based-name.xml");
         ConstructorBasedTypeMatchingBean bean = context.getBean(ConstructorBasedTypeMatchingBean.class);
         bean.sayHello();
     }

@@ -164,10 +164,10 @@ Dependencies). Mit der Methode **T getBean(String name, Class<T> requiredType)**
 werden.
 
 In der
-Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+Klasse [ClassPathXmlApplicationContextRunner.java](src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
 wird der Container in der Form des **ClassPathXmlApplicationContext** verwendet.
 
-Im [bean-config.xml](./src/main/resources/bean-config.xml) wird eine Bean konfiguriert.
+Im [bean-config.xml](src/main/resources/bean-config.xml) wird eine Bean konfiguriert.
 
 ```java
 ApplicationContext context=new ClassPathXmlApplicationContext("bean-config.xml");
@@ -176,7 +176,7 @@ SpringBean springBean=context.getBean(SpringBean.class);
 springBean.sayHello();
 ```
 
-Der Code der Klasse [SpringBean](./src/main/java/ch/wesr/spring/core/container/xml/beans/SpringBean.java) implementiert
+Der Code der Klasse [SpringBean](src/main/java/ch/wesr/spring/core/container/xml/beans/SpringBean.java) implementiert
 die Methode **sayHello()**.
 
 Das ApplicationContext Interface verfügt über einige andere Methoden zum Abrufen von Beans, aber im Idealfall sollte
@@ -333,7 +333,7 @@ Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.c
 ```
 
 Das gesamte Code Beispiele findest du in der
-Klasse [ClassPathXmlApplicationContextRunner.java](./src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
+Klasse [ClassPathXmlApplicationContextRunner.java](src/main/java/ch/wesr/spring/core/container/xml/ClassPathXmlApplicationContextRunner.java)
 
 ### Beans instanzieren
 
@@ -426,7 +426,7 @@ assert Objects.requireNonNull(clientServiceByLocator1).isInstance(ClientService.
 ````
 
 Das gesamte Code Beispiel findest du in der
-Klasse [InstanceFactoryBeanRunner.java](.src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
+Klasse [InstanceFactoryBeanRunner.java](src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
 
 ## Dependency Injection
 
@@ -435,109 +435,11 @@ Klasse [InstanceFactoryBeanRunner.java](.src/main/java/ch/wesr/spring/core/conta
 
 ### Constructor-based
 
-#### Constructor Argument Resolution
+#### [Constructor argument resolution](doc/dependencies/di/constructor_argument_resolution.md)
 
-Die Konstruktor Argument Auflösung erfolgt über den Typ des Arguments. Sind die **<constructor-arg/>** eindeutig, z.B.
-wenn ein anderes Bean referenziert wird, so muss die Reihenfolge Argumente der Bean-Definition
+#### [Constructor argument type matching](doc/dependencies/di/constructor_argument_type_matching.md)
 
-````xml
-
-<bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedBean">
-    <constructor-arg ref="springBean1"/>
-    <constructor-arg ref="springBean"/>
-    <-- in untenstehendem Konstruktor ist die Defintion des SpringBean an erster Stelle
-</bean>
-
-<bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
-
-<bean id="springBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
-````
-
-und die Reihenfolge der Argumente im Konstruktor nicht übereinstimmen.
-
-````java
-public class ConstructorBasedBean {
-
-    public ConstructorBasedBean(SpringBean springBean, SpringBean1 springBean1) {
-        // ...
-    }
-}
-````
-
-Code
-Beispiel: [SimpleConstructorBasedRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorBasedRunner.java)
-
-#### Constructor argument type matching
-
-Wenn ein einfacher Typ verwendet wird, wie z.B. \<value>true\</value>, kann Spring den Typ des Wertes nicht bestimmen
-und kann daher nicht ohne Hilfe nach Typ abgleichen. Der Container kann einfache Typen nur auflösen, wenn diese in der
-Bean Definition mit dem **type** Attribut angegeben werden.
-
-Diese Auflösung erfolgt über eine Bean Definition
-
-````xml
-
-<bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
-    <constructor-arg type="int" value="5000"/>
-    <constructor-arg type="java.lang.String" value="Hallo Zahl"/>
-</bean>
-````
-
-und der entsprechenden Deklaration im Konstruktor
-
-````java
-public class ConstructorBasedTypeMatchingBean {
-    private final int zahl;
-    private final String hello;
-
-    public ConstructorBasedTypeMatchingBean(int zahl, String hello) {
-        this.zahl = zahl;
-        this.hello = hello;
-    }
-}
-````
-
-Code
-Beispiel: [SimpleConstructorTypeMatchingRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeMatchingRunner.java)
-
-#### Constructor argument index
-
-Beim Index Konstruktor werden nicht die Typen angegeben, sondern die Indices.
-
-**Der Index beginnt bei 0**.
-
-````xml
-
-<bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
-    <constructor-arg index="0" value="5000"/>
-    <constructor-arg index="1" value="Hallo Zahl"/>
-</bean>
-````
-
-Code
-Beispiel: [SimpleConstructorTypeIndexRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorTypeIndexRunner.java)
-
-#### Constructor argument name
-
-Die Argumente können aber auch über die Namen definiert werden Dabei spielte die Reihenfolge der Benennung der **
-constructor-arg** keine Rolle.
-
-````xml
-
-<bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedTypeMatchingBean">
-    <constructor-arg name="zahl" value="5000"/>
-    <constructor-arg name="hello" value="Hallo Zahl"/>
-</bean>
-````
-
-Damit sich obiges Beispiel kompilieren lässt, muss der Code mit dem **Debug Flag** kompiliert werden!
-Was aber in Intellij scheinbar default ist.
-
-Wenn man den Code aber nicht mit dem **Debug-Flag** kompilieren will, kann man die **@ConstructorProperties
-JDK-Annotation** verwenden, um das Konstruktorargumente explizit zu benennen.
-
-Code
-Beispiel: [SimpleConstructorNameRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleConstructorNameRunner.java)
+#### [Constructor argument index](doc/dependencies/di/constructor_argument_index.md)
 
 ## TODO @ConstructorProperties Beispiel
 
@@ -554,53 +456,7 @@ public class ExampleBean {
 
 ### Setter based
 
-Setter beased Dependency Injection wird erreicht, indem der Container Setter Methoden der Beans aufruft. Dazu muss der
-Container das zu injizierende (to be injected) Bean über einen Konstruktor ohne Argumente oder eine statische Factory
-Methode ohne Argument instanzieren.
-
-Zuerst werden beide Beans in der xml Datei definiert. Dabei wird dem **setterBasedBean** über ein \<property/> die
-SpringBean als Referenz mitgegeben.
-
-````xml
-
-<bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
-
-<bean id="setterBasedBean" class="ch.wesr.spring.core.container.xml.beans.SetterBasedBean">
-<property name="springBean" ref="springBean"/>
-</bean>
-````
-
-Das SetterBean selber ist eine ganz einfache Pojo Klasse ohne Firlefanz.
-
-````java
-public class SetterBasedBean {
-
-    // SetterBased Bean hat eine Dependency zu SpringBean
-    private SpringBean springBean;
-
-    // eine Setter Methode, sodass der Container die SpringBean injecten kann
-    public void setSpringBean(SpringBean springBean) {
-        this.springBean = springBean;
-        System.out.println("springBean wurde gesetzt in " + this.getClass().getName());
-    }
-
-    public void sayHello() {
-        springBean.sayHello();
-    }
-}
-````
-
-Wie gewohnt kann über den ApplicationContext die SetterBaseBean aufgerufen werden.
-
-```java
-ApplicationContext context=new ClassPathXmlApplicationContext("setter-based.xml");
-
-SetterBasedBean bean=context.getBean(SetterBasedBean.class);
-bean.sayHello();
-```
-
-Code
-Beispiel: [SimpleSetterDIRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleSetterDIRunner.java)
+### [Setter based ohne Argumente](doc/dependencies/di/setter_based_ohne_argumente.md)
 
 ### Constructor oder Setter based Dependency Injection
 
@@ -613,57 +469,7 @@ immer zum Caller zurückgegeben. Diese Variante mit (zu vielen) Argumenten zu ve
 verschwinden sondern ist auch eine schlechte Code Variante. Besonders bei (third-party) Klassen, von welchen man den
 Source Code nicht besitzt ist die constructor-based Variante ohne Argumente von Vorteil.
 
-Die **Setter-based** Variante sollte vor allem für optionale Abhängigkeiten, welche im Sinne einer Konfiguration verwendet,
-gesetzt werden. Dabei muss beachtet werden, dass bei Verwendung der optionale Abhängigkeit immer ein **null-check**
-gemacht werden muss, bevor die Abhängigkeit verwendet wird.
-````xml
-
-<bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
-<bean id="setterBasedBean" class="ch.wesr.spring.core.container.xml.beans.SetterBasedBean">
-<!-- Die springBean wird zwar deklariert, aber nicht als Referenz der setterbaseBean übergeben -->
-</bean>
-````
-
-````java
-public class SetterBasedBean {
-
-    // SetterBased Bean hat eine Dependency zu SpringBean
-    private SpringBean springBean;
-
-    // eine Setter Methode, sodass der Container die SpringBean injecten kann
-    public void setSpringBean(SpringBean springBean) {
-        this.springBean = springBean;
-        System.out.println("springBean wurde gesetzt in "+this.getClass().getName());
-    }
-
-    public void sayHello() {
-        Objects.requireNonNull(springBean, "Achtung! Wenn die SpringBean optional verwendet wird, muss sie auf null-check geprüft werden.").sayHello();
-    }
-}
-````
-Der entsprechende Aufruf 
-````java
-public class SimpleSetterOptionalDIRunner {
-
-    public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("setter-based-optional.xml");
-
-        SetterBasedBean bean = context.getBean(SetterBasedBean.class);
-        bean.sayHello();
-    }
-}
-````
-resultiert dann in einer Null-Pointer Exception
-````text
-Exception in thread "main" java.lang.NullPointerException: Achtung! Wenn die SpringBean optional verwendet wird, muss sie auf null-check geprüft werden.
-	at java.base/java.util.Objects.requireNonNull(Objects.java:247)
-	at ch.wesr.spring.core.container.xml.beans.SetterBasedBean.sayHello(SetterBasedBean.java:17)
-	at ch.wesr.spring.core.container.xml.dependencyinjection.SimpleSetterOptionalDIRunner.main(SimpleSetterOptionalDIRunner.java:13)
-````
-
-Code Beispiel [SimpleSetterOptionalDIRunner.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimpleSetterOptionalDIRunner.java)
-
-#Frage: Wie kann ich zur Laufzeit entscheiden ob der Setter injected werden soll oder nicht?
+### [Setter based für optionale Abhängigkeiten](doc/dependencies/di/setter_based_optional.md)
 
 ### Der Dependency Resolution (Auflösung) Process
 Der Container (ApplicationContext) löst die Bean Abhängigkeiten folgendermassen aus.
@@ -772,7 +578,7 @@ Verwendet man für den p-namespace eine IDE wie IntelliJ wird man dabei auch wun
 
 Code Beispiel: [SimplePDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePDataSource.java)
 
-# TODO java.util.Properties verwwenden?
+# TODO java.util.Properties verwenden?
 Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-source-placeholder.xml)
 
 Das Code Beispiel erstellt - habe ich aber noch nicht verstanden und funktioniert deshalb noch nicht.
