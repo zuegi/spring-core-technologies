@@ -530,6 +530,8 @@ Kann auch im parent-child Kontext verwendet werden.
 
 Obwohl das parent ref Beispiel an dieser Stelle in der Spring Doku erwähnt wird, habe ich keinen Plan wie das umgesetzt wirde.
 
+#### [Inner Beans](doc/dependencies/configurations/inner_beans.md)
+Inner Beans werden als \<bean/> Element innerhalb der \</property/> oder \<constructor-arg/> Elemente einer Outer Bean definiert.
 
 
 ## to be completed

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="outerBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.inner.ConstructorArgOuterBean">
+        <constructor-arg name="innerBean">
+            <bean class="ch.wesr.spring.core.container.xml.dependencyinjection.inner.InnerBean">
+                <property name="name" value="René"/>
+                <property name="alter" value="52"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+</beans>
