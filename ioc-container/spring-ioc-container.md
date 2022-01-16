@@ -517,6 +517,13 @@ Code Beispiel [SimplePropertiesDataSource.java](src/main/java/ch/wesr/spring/cor
 
 #### [Das idref Element](doc/dependencies/configurations/idref.md)
 Das *idref* Element wird verwendet um die Id eines Beans einem anderen Bean als String zur Verfügung zu stellen.
+Die Verwendung des *idref* Tag ermöglicht dem Container zum Zeitpunkt der Erstellung zu überprüfen ob die referenzierte Bean tatsächlich existiert.
+
+### Referenezen zu anderen Beans (Collaborators)
+
+#### [Das ref Element](doc/dependencies/configurations/ref.md)
+Das *ref* Element wird als letztes (finales) Element innerhalb von \<property/> oder \<constructor-arg/> verwendet.
+Kann auch im parent-child Kontext verwendet werden.
 
 
 ## to be completed
