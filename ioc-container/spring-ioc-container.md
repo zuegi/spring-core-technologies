@@ -441,7 +441,7 @@ Klasse [InstanceFactoryBeanRunner.java](src/main/java/ch/wesr/spring/core/contai
 
 #### [Constructor argument index](doc/dependencies/di/constructor_argument_index.md)
 
-## TODO @ConstructorProperties Beispiel
+**TODO @ConstructorProperties Beispiel**
 
 ````java
 public class ExampleBean {
@@ -509,7 +509,7 @@ Der Spring *conversion service* konvertiert dann diese Werte aus einem String in
 #### [Verwendung des p-namespace aus dem Spring Schema]()
 Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
 
-# TODO java.util.Properties verwenden?
+**TODO java.util.Properties verwenden?**
 Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-source-placeholder.xml)
 
 Das Code Beispiel erstellt - habe ich aber noch nicht verstanden und funktioniert deshalb noch nicht.
@@ -524,6 +524,12 @@ Die Verwendung des *idref* Tag ermöglicht dem Container zum Zeitpunkt der Erste
 #### [Das ref Element](doc/dependencies/configurations/ref.md)
 Das *ref* Element wird als letztes (finales) Element innerhalb von \<property/> oder \<constructor-arg/> verwendet.
 Kann auch im parent-child Kontext verwendet werden.
+
+#### [Das ref Element zu einem parent](doc/dependencies/configurations/ref_mit_parent.md)
+**TODO ref mit parent** 
+
+Obwohl das parent ref Beispiel an dieser Stelle in der Spring Doku erwähnt wird, habe ich keinen Plan wie das umgesetzt wirde.
+
 
 
 ## to be completed
