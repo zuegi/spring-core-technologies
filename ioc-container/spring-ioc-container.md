@@ -29,7 +29,7 @@ jeglichen Objekt Typen.
 Kurz gesagt, die BeanFactory stellt das Konfigurationsframework und die Basisfunktionalität bereit, und der
 ApplicationContext fügt weitere unternehmensspezifische Funktionen hinzu.
 
-### Container Übersicht
+## Container Übersicht
 
 Das **org.springframework.context.ApplicationContext** Interface representiert den Spring IoC Container und ist
 verantwortlich für die Instanzierung, Konfiguration und Zusammenstellung (assembling) der Beans. Der Container erhält
@@ -428,18 +428,20 @@ assert Objects.requireNonNull(clientServiceByLocator1).isInstance(ClientService.
 Das gesamte Code Beispiel findest du in der
 Klasse [InstanceFactoryBeanRunner.java](src/main/java/ch/wesr/spring/core/container/xml/InstanceFactoryBeanRunner.java)
 
-## Dependency Injection
+## Dependencies
+
+### Dependency Injection
 
 * Constructor-based
 * Setter-based
 
-### Constructor-based
+#### Constructor-based
 
-#### [Constructor argument resolution](doc/dependencies/di/constructor_argument_resolution.md)
+##### [Constructor argument resolution](doc/dependencies/di/constructor_argument_resolution.md)
 
-#### [Constructor argument type matching](doc/dependencies/di/constructor_argument_type_matching.md)
+##### [Constructor argument type matching](doc/dependencies/di/constructor_argument_type_matching.md)
 
-#### [Constructor argument index](doc/dependencies/di/constructor_argument_index.md)
+##### [Constructor argument index](doc/dependencies/di/constructor_argument_index.md)
 
 **TODO @ConstructorProperties Beispiel**
 
@@ -458,7 +460,7 @@ public class ExampleBean {
 
 ### [Setter based ohne Argumente](doc/dependencies/di/setter_based_ohne_argumente.md)
 
-### Constructor oder Setter based Dependency Injection
+#### Constructor oder Setter based Dependency Injection
 
 Obwohl es möglich ist constructor-based und setter-based Dependency Injection zu kombinieren/mischen ist es ein gute
 Gewohnheit constructor-based DI für zwingende Abhängigkeiten zu verwenden. Während dem die setter-based Variante eher
@@ -469,9 +471,9 @@ immer zum Caller zurückgegeben. Diese Variante mit (zu vielen) Argumenten zu ve
 verschwinden sondern ist auch eine schlechte Code Variante. Besonders bei (third-party) Klassen, von welchen man den
 Source Code nicht besitzt ist die constructor-based Variante ohne Argumente von Vorteil.
 
-### [Setter based für optionale Abhängigkeiten](doc/dependencies/di/setter_based_optional.md)
+#### [Setter based für optionale Abhängigkeiten](doc/dependencies/di/setter_based_optional.md)
 
-### Der Dependency Resolution (Auflösung) Process
+#### Der Dependency Resolution (Auflösung) Process
 Der Container (ApplicationContext) löst die Bean Abhängigkeiten folgendermassen aus.
 
 * Der ApplicationContext wird erstellt und initalisiert alle Beans über die Metadata-Konfiguration (xml, Java Code oder Annotations).
@@ -490,7 +492,7 @@ Ansonsten gilt, das Bean wird erst erzeugt, wenn es angefordert (requested) wird
 Die Erstellung einer Bean führt potenziell zur Erstellung eines Graphen von Beans, da die Abhängigkeiten der Bean und die Abhängigkeiten ihrer Abhängigkeiten (und so weiter) erstellt und zugewiesen werden. 
 Achtung: Fehler beim Auflösen solcher Abhängigkeiten können erst spät auftauchen, nämlkich dann wenn die betroffenen Beans erstellt werden.
 
-### Circular Dependencies
+#### Circular Dependencies
 Bei überwiegend verwendeten Constructor-based DI kann es sein, dass man sich unauflösbare, zirkuläre Abhängigkeiten schafft.
 
 Zum Beispiel: Klasse A benötigt eine Instanz von Klasse B durch Konstruktorinjektion, und Klasse B benötigt eine Instanz von Klasse A durch Konstruktorinjektion. Wenn Sie Beans für die Klassen A und B so konfigurieren, dass sie ineinander injiziert werden, erkennt der Spring IoC-Container diese zirkuläre Referenz zur Laufzeit und löst eine BeanCurrentlyInCreationException aus.
@@ -498,15 +500,15 @@ Eine mögliche Lösung besteht darin, den Quellcode einiger Klassen so zu bearbe
 Im Gegensatz zum typischen Fall (ohne zirkuläre Abhängigkeiten) zwingt eine zirkuläre Abhängigkeit zwischen Bean A und Bean B dazu, dass eine der Beans in die andere injiziert wird, bevor sie selbst vollständig initialisiert ist (ein klassisches Huhn-und-Ei-Szenario).
 
 
-### Dependencies and Configuration
+#### Dependencies and Configuration
 Bean-Eigenschaften und Konstruktorargumente können als Referenzen auf andere verwaltete Beans (Collaborators) oder als inline definierte Werte definiert werden. 
 Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zweck Unterelementtypen innerhalb ihrer \<property/>- und \<constructor-arg/>-Elemente.
 
-#### [Straight Values (Primitives, Strings)](doc/dependencies/configurations/straight_values.md)
+##### [Straight Values (Primitives, Strings)](doc/dependencies/configurations/straight_values.md)
 Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
 Der Spring *conversion service* konvertiert dann diese Werte aus einem String in den effektiv verwendeten Typ.
 
-#### [Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
+##### [Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
 Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
 
 **TODO java.util.Properties verwenden?**
@@ -515,17 +517,17 @@ Siehe Beispiel: [property-source-placeholder.xml](src/main/resources/property-so
 Das Code Beispiel erstellt - habe ich aber noch nicht verstanden und funktioniert deshalb noch nicht.
 Code Beispiel [SimplePropertiesDataSource.java](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/SimplePropertiesDataSource.java)
 
-#### [Das idref Element](doc/dependencies/configurations/idref.md)
+##### [Das idref Element](doc/dependencies/configurations/idref.md)
 Das *idref* Element wird verwendet um die Id eines Beans einem anderen Bean als String zur Verfügung zu stellen.
 Die Verwendung des *idref* Tag ermöglicht dem Container zum Zeitpunkt der Erstellung zu überprüfen ob die referenzierte Bean tatsächlich existiert.
 
-### Referenezen zu anderen Beans (Collaborators)
+#### Referenezen zu anderen Beans (Collaborators)
 
-#### [Das ref Element](doc/dependencies/configurations/ref.md)
+##### [Das ref Element](doc/dependencies/configurations/ref.md)
 Das *ref* Element wird als letztes (finales) Element innerhalb von \<property/> oder \<constructor-arg/> verwendet.
 Kann auch im parent-child Kontext verwendet werden.
 
-#### [Das ref Element zu einem parent](doc/dependencies/configurations/ref_mit_parent.md)
+##### [Das ref Element zu einem parent](doc/dependencies/configurations/ref_mit_parent.md)
 **TODO ref mit parent** 
 
 Obwohl das parent ref Beispiel an dieser Stelle in der Spring Doku erwähnt wird, habe ich keinen Plan wie das umgesetzt wirde.
@@ -551,15 +553,16 @@ private Set<MeineBean> beanSet;
 ````
 Was in der [Collections](doc/dependencies/configurations/collections.md) auch so verwendet wurde.
 
-### Xml Shortcouts in Schema Namespaces
-#### Property Based
+#### Xml Shortcouts in Schema Namespaces
+##### Property Based
 [Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
 
-#### Constructor Argument based
+##### Constructor Argument based
 [Verwendung des c-namespace aus dem Spring Schema/Constructor Argument based](doc/dependencies/configurations/schema_c_namespace.md)
 
-### [Compound Property Name](doc/dependencies/configurations/compound_property_names.md)
+#### [Compound Property Name](doc/dependencies/configurations/compound_property_names.md)
 
+### [Using depends-on]()
 
 ## to be completed
 
