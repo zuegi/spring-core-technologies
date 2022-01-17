@@ -1,6 +1,6 @@
-# Verwendung des p-namespace aus dem Spring Xml Schema
+# Verwendung des c-namespace aus dem Spring Xml Schema
 
-Beachte die Verwendung des *Schema p* **xmlns:p="http://www.springframework.org/schema/p"**
+Beachte die Verwendung des *Schema c* **xmlns:p="http://www.springframework.org/schema/p"**
 Mit dem p-namespace (p:<variablenname>) kann mann die Attribute des Bean-Elements (anstelle von verschachtelten <property/>-Elementen) verwenden.
 
 Spring unterstützt erweiterbare Konfigurationsformate mit Namespaces, die auf einer XML-Schema-Definition beruhen.

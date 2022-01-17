@@ -31,6 +31,19 @@
             </list>
         </property>
 
+        <property name="beanMap">
+            <map>
+                <entry key="springBean1" value-ref="springBean1"/>
+                <entry key="springBean2" value-ref="springBean2"/>
+            </map>
+        </property>
+
+        <property name="beanSet">
+            <set>
+                <ref bean="springBean1" />
+                <ref bean="springBean2" />
+            </set>
+        </property>
     </bean>
 
 

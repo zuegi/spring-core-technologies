@@ -6,6 +6,12 @@ public class BasicDataSource {
     private String url;
     private String username;
     private String password;
+    private SpringBean springBean;
+
+    public void sayHello() {
+        System.out.println("Hello "+getUsername() +", du verbindest dich mit " +getUrl());
+        springBean.sayHello();
+    }
 
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
@@ -31,7 +37,11 @@ public class BasicDataSource {
         this.password = password;
     }
 
-    public void sayHello() {
-        System.out.println("Hello "+getUsername() +", du verbindest dich mit " +getUrl());
+    public SpringBean getSpringBean() {
+        return springBean;
+    }
+
+    public void setSpringBean(SpringBean springBean) {
+        this.springBean = springBean;
     }
 }

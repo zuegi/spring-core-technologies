@@ -506,7 +506,7 @@ Die XML-basierten Konfigurationsmetadaten von Spring unterstützen zu diesem Zwe
 Das *value* Attribut im \<property/> Element definiert ein Property oder ein Konstruktor Argument als einen lesbaren String.
 Der Spring *conversion service* konvertiert dann diese Werte aus einem String in den effektiv verwendeten Typ.
 
-#### [Verwendung des p-namespace aus dem Spring Schema]()
+#### [Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
 Wenn man den **p-namespace** für kürzere XML Konfigurationen verwendet geht die Bean Configuration noch einfacher
 
 **TODO java.util.Properties verwenden?**
@@ -536,6 +536,26 @@ Inner Beans werden als \<bean/> Element innerhalb der \</property/> oder \<const
 #### [Collections](doc/dependencies/configurations/collections.md)
 Der Wert eines Map Keys oder Values bzw. eines Set Values kann auch eines der folgenden Elemente sein:
 bean | ref | idref | list | set | map | props | value | null
+
+**TODO Collection Merging**
+Ist wieder eine parent Child Geschichte, welche ich noch nicht verstanden habe. Wird aber im Kapitel Bean Dfinition Inheritance verarbeitet.
+
+**Strongly Typed Collection**
+
+Seit Java 5 können generische Typen für die Collections verwendet werden. 
+````java
+private List<String> kundenListe;
+private List<MeineBean> beanListe;
+private Map<String, MeineBean> beanMap;
+private Set<MeineBean> beanSet;
+````
+Was in der [Collections](doc/dependencies/configurations/collections.md) auch so verwendet wurde.
+
+### Xml Shortcouts with namespaces
+#### Property Based
+[Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
+#### Constructor Argument based
+[Verwendung des c-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_c_namespace.md)
 
 ## to be completed
 
