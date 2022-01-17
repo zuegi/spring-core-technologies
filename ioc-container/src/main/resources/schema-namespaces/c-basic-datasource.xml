@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+    <bean id="springBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
+
+    <bean class="ch.wesr.spring.core.container.xml.beans.ConstructorBasedBean">
+        <constructor-arg ref="springBean1"/>
+        <constructor-arg ref="springBean"/>
+    </bean>
+
+    <bean id="cNameSpaceBean"
+          class="ch.wesr.spring.core.container.xml.dependencyinjection.schemanamespaces.AnotherConstructorBasedBean"
+          c:springBean-ref="springBean"
+          c:springBean1-ref="springBean1"
+    />
+</beans>
