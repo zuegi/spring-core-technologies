@@ -551,12 +551,15 @@ private Set<MeineBean> beanSet;
 ````
 Was in der [Collections](doc/dependencies/configurations/collections.md) auch so verwendet wurde.
 
-### Xml Shortcouts with namespaces
+### Xml Shortcouts in Schema Namespaces
 #### Property Based
 [Verwendung des p-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_p_namespace.md)
 
 #### Constructor Argument based
-[Verwendung des c-namespace aus dem Spring Schema](doc/dependencies/configurations/schema_c_namespace.md)
+[Verwendung des c-namespace aus dem Spring Schema/Constructor Argument based](doc/dependencies/configurations/schema_c_namespace.md)
+
+### [Compound Property Name](doc/dependencies/configurations/compound_property_names.md)
+
 
 ## to be completed
 

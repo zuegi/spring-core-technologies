@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fred" class="ch.wesr.spring.core.container.xml.dependencyinjection.compoundpropertynames.SpringBeanFred">
+        <property name="bob" ref="bob"/>
+    </bean>
+    <bean id="bob" class="ch.wesr.spring.core.container.xml.dependencyinjection.compoundpropertynames.SpringBeanBob">
+        <property name="sam" ref="sam"/>
+    </bean>
+    <bean id="sam" class="ch.wesr.spring.core.container.xml.dependencyinjection.compoundpropertynames.SpringBeanSam"/>
+
+    <bean id="compoundPropertyNameBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.compoundpropertynames.CompoundPropertyNamesBean">
+        <property name="fred" ref="fred"/>
+        <property name="fred.bob.sam.age" value="88" />
+    </bean>
+</beans>
