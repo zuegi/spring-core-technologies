@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleSetterOptionalDIRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("setterbased/setter-based-optional.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/setterbased/setter-based-optional.xml");
 
         SetterBasedBean bean = context.getBean(SetterBasedBean.class);
         bean.sayHello();

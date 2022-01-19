@@ -3,7 +3,7 @@
 Die Elemente \<list/>, \<set/>, \<map/> und \<props/> setzen die Eigenschaften und Argumente der Java Collection-Typen List, 
 Set, Map und Properties. Das folgende Beispiel zeigt, wie sie zu verwenden sind:
 
-### [collections.xml](../../../src/main/resources/collections/collections.xml)
+### [collections.xml](../../../src/main/resources/dependencies/collections/collections.xml)
 ```xml
  <bean id="springBean1" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.collections.SpringBean1"/>
 <bean id="springBean2" name="customBean1, dedicatedBean1" class="ch.wesr.spring.core.container.xml.dependencyinjection.collections.SpringBean2"/>

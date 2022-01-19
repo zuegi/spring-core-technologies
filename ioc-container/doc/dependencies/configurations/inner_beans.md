@@ -12,7 +12,7 @@ Dies ist kein übliches Szenario. Innere Beans teilen sich in der Regel einfach 
 
 ## Beispiel Inner Bean via \<property/> Element
 
-### [inner-bean.xml](../../../src/main/resources/inner/property-inner-bean.xml)
+### [inner-bean.xml](../../../src/main/resources/dependencies/inner/property-inner-bean.xml)
 ```xml
 <bean id="outerBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.inner.OuterBean">
     <property name="innerBean">
@@ -71,7 +71,7 @@ Hello from InnerBean
 
 ## Beispiel via \<constructor-arg/> Element
 
-###[constructor-arg-inner-bean.xml](../../../src/main/resources/inner/constructor-arg-inner-bean.xml)
+###[constructor-arg-inner-bean.xml](../../../src/main/resources/dependencies/inner/constructor-arg-inner-bean.xml)
 ```xml
 <bean id="outerBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.inner.ConstructorArgOuterBean">
     <constructor-arg name="innerBean">

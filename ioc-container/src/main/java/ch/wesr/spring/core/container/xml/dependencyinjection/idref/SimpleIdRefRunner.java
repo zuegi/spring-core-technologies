@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleIdRefRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("idref/idref-configuration.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/idref/idref-configuration.xml");
 
         IdRefBean bean = context.getBean(IdRefBean.class);
         bean.sayHello();

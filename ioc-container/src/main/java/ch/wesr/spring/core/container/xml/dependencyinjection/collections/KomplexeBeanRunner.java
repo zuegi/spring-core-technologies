@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class KomplexeBeanRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("collections/collections.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/collections/collections.xml");
         KomplexeBean bean = context.getBean(KomplexeBean.class);
         bean.sayHello();
     }

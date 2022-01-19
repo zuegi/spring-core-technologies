@@ -560,9 +560,9 @@ Was in der [Collections](doc/dependencies/configurations/collections.md) auch so
 ##### Constructor Argument based
 [Verwendung des c-namespace aus dem Spring Schema/Constructor Argument based](doc/dependencies/configurations/schema_c_namespace.md)
 
-#### [Compound Property Name](doc/dependencies/configurations/compound_property_names.md)
+##### [Compound Property Name](doc/dependencies/configurations/compound_property_names.md)
 
-### [Using depends-on]()
+### [Using depends-on](doc/dependencies/di/depends_on.md)
 
 ## to be completed
 

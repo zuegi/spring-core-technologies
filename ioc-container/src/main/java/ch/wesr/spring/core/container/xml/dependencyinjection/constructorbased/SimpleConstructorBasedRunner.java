@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleConstructorBasedRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("constructorbased/constructor-based.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/constructorbased/constructor-based.xml");
 
         ConstructorBasedBean constructorBasedBean = context.getBean(ConstructorBasedBean.class);
         constructorBasedBean.sayHello();

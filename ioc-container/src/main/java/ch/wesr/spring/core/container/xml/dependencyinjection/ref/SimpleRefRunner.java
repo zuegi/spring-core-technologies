@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleRefRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("ref/simple-ref.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/ref/simple-ref.xml");
 
         RefBean bean = context.getBean(RefBean.class);
         bean.sayHello();

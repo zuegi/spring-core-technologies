@@ -9,7 +9,7 @@ Der c-Namespace ist jedoch nicht in einer XSD-Datei definiert und existiert nur 
 In folgendem Beispiel wird auch ein spezielles Format verwendet.
 Mit der Definition **c:springBean-ref="springBean** wird eine Referenz auf das SpringBean konfiguriert.
 
-### [c-basic-datasource.xml](../../../src/main/resources/schema-namespaces/c-basic-datasource.xml)
+### [c-basic-datasource.xml](../../../src/main/resources/dependencies/schema-namespaces/c-basic-datasource.xml)
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"

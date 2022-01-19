@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class OuterBeanRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("inner/property-inner-bean.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/inner/property-inner-bean.xml");
 
         OuterBean bean = context.getBean(OuterBean.class);
         bean.sayHello();

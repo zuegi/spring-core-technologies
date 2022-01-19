@@ -32,12 +32,12 @@ Der entsprechende Aufruf
 ````java
 public class SimpleSetterOptionalDIRunner {
 
-  public static void main(String[] args) {
-    ApplicationContext context = new ClassPathXmlApplicationContext("setterbased/setter-based-optional.xml");
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/setterbased/setter-based-optional.xml");
 
-    SetterBasedBean bean = context.getBean(SetterBasedBean.class);
-    bean.sayHello();
-  }
+        SetterBasedBean bean = context.getBean(SetterBasedBean.class);
+        bean.sayHello();
+    }
 }
 ````
 resultiert dann in einer Null-Pointer Exception

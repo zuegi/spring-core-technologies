@@ -8,7 +8,7 @@ public class SimpleConstructorNameRunner {
 
     public static void main(String[] args) {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("constructorbased/constructor-based-name.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/constructorbased/constructor-based-name.xml");
         ConstructorBasedTypeMatchingBean bean = context.getBean(ConstructorBasedTypeMatchingBean.class);
         bean.sayHello();
     }

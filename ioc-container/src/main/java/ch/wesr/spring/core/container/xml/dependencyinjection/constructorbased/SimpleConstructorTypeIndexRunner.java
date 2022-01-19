@@ -8,7 +8,7 @@ public class SimpleConstructorTypeIndexRunner {
 
     public static void main(String[] args) {
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("constructorbased/constructor-based-type-matching.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/constructorbased/constructor-based-type-matching.xml");
         ConstructorBasedTypeMatchingBean bean = context.getBean(ConstructorBasedTypeMatchingBean.class);
         bean.sayHello();
     }

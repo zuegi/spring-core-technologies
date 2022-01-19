@@ -4,7 +4,7 @@ Die [CompoundPropertyNamesBean.java](../../../src/main/java/ch/wesr/spring/core/
 hat ein Fred Attribut, welches ein Bob Attribut, welches ein Sam Attribut, welches ein age Attribut besitzt, 
 was den Wert 88 übertragen bekommt
 
-### [xml-config-datei.xml](../../../src/main/resources/ref/simple-ref.xml)
+### [xml-config-datei.xml](../../../src/main/resources/dependencies/ref/simple-ref.xml)
 ```xml
 <bean id="fred" class="ch.wesr.spring.core.container.xml.dependencyinjection.compoundpropertynames.SpringBeanFred">
     <property name="bob" ref="bob"/>

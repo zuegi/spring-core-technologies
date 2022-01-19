@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CompoundPropertyNamesBeanRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("compoundpropertynames/compound-property-names.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/compoundpropertynames/compound-property-names.xml");
         CompoundPropertyNamesBean bean = context.getBean(CompoundPropertyNamesBean.class);
         bean.sayHello();
     }

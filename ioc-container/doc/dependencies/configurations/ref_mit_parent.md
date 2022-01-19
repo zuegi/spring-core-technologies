@@ -2,7 +2,7 @@
 
 **TODO ref mit parent container** 
 
-###[simple-ref.xml](../../../src/main/resources/ref/simple-ref.xml)
+###[simple-ref.xml](../../../src/main/resources/dependencies/ref/simple-ref.xml)
 ```xml
 
 ```

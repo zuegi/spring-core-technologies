@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class ConstructorArgOuterBeanRunner {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("inner/constructor-arg-inner-bean.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/inner/constructor-arg-inner-bean.xml");
         ConstructorArgOuterBean bean = context.getBean(ConstructorArgOuterBean.class);
 
         bean.sayHello();

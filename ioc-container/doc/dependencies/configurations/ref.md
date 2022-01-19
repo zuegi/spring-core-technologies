@@ -11,7 +11,7 @@ Die referenzierte Bean *justAnotherBean* ist ein Ahängigkeit zur Bean *refBean*
 *refBean* wird nach Bedarf erstellt - erst danach wird der Wert des Property *justAnotherBean* gesetzt.
 In diesem Fall ist der Collaborator (*justAnotherBean* von der Klasse SpringBean.java) eine Singleton-Bean und wurde bereits vom Container erstellt.
 
-### [simple-ref.xml](../../../src/main/resources/ref/simple-ref.xml)
+### [simple-ref.xml](../../../src/main/resources/dependencies/ref/simple-ref.xml)
 ```xml
 <bean name="justAnotherBean" class="ch.wesr.spring.core.container.xml.beans.SpringBean" />
 <bean name="refBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.ref.RefBean">

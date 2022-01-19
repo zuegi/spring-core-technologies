@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleDataSource {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("straightvalues/basic-datasource.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/straightvalues/basic-datasource.xml");
 
         BasicDataSource bean = context.getBean(BasicDataSource.class);
         bean.sayHello();

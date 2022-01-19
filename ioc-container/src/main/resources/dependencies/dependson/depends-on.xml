@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="springBean"  class="ch.wesr.spring.core.container.xml.beans.SpringBean"/>
+    <bean id="springBean1" class="ch.wesr.spring.core.container.xml.beans.SpringBean1"/>
+
+    <bean id="dependsOnBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.dependson.DependsOnBean" depends-on="springBean,springBean1">
+        <property name="springBean" ref="springBean"/>
+        <property name="springBean1" ref="springBean1"/>
+    </bean>
+
+</beans>
