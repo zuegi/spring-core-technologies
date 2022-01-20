@@ -567,5 +567,8 @@ Was in der [Collections](doc/dependencies/configurations/collections.md) auch so
 ### [Using lazy-init](doc/dependencies/di/lazy_initialized.md)
 (#TODO - mir fehlt hier noch der Beweis in obigem Beispiel)
 
+### Autowiring Collaborators
+
+
 ## to be completed
 

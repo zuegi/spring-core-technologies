@@ -46,6 +46,12 @@ Vorhandene Bean: springBean1
 Vorhandene Bean: lazy
 ````
 
+Zudem kann man den ganzen **Container** auf lazy loading setzen
+```xml
+<beans default-lazy-init="true">
+      <!-- no beans will be pre-instantiated... -->
+</beans>
+```
 
 ## Referenzen
 [Lazy Initialization in Spring Boot](https://springhow.com/lazy-initialization-in-spring-boot/)
