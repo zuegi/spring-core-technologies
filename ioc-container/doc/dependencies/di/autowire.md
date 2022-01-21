@@ -1,4 +1,4 @@
-# Spring <template> Beispiel
+# Spring autowire Beispiel
 
 In Spring gibt es 2 Möglichkeiten Beans zu injecten - manuell oder autowired.
 
