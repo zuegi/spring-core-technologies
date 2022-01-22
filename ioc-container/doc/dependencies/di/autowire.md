@@ -254,13 +254,17 @@ Hello from ch.wesr.spring.core.container.xml.beans.SpringBean
 Hello from ch.wesr.spring.core.container.xml.beans.SpringBean1: ch.wesr.spring.core.container.xml.beans.SpringBean1@6646153
 ````
 
-Ausdeutschen
+### autowire-candiate mit pattern machting
+Beans, welche als **autowire-candidate** deklariert werden, können auch auf der Grundlage von *pattern-matching* im Bean Namen eingeschränkt werden.
 
-Sie können Autowire-Kandidaten auch auf der Grundlage von Mustervergleichen mit Bean-Namen einschränken. Das <beans/>-Element der obersten Ebene akzeptiert ein oder mehrere Muster in seinem Attribut default-autowire-candidates. Um beispielsweise den Autowire-Kandidatenstatus auf alle Beans zu beschränken, deren Name mit Repository endet, geben Sie den Wert *Repository an. Um mehrere Muster anzugeben, definieren Sie diese in einer durch Komma getrennten Liste. Ein expliziter Wert von true oder false für das Attribut "autowire-candidate" einer Bean-Definition
-42
-
+Das **<beans/>** Element der obersten Ebene akzeptiert ein oder mehrere Muster in seinem Attribut default-autowire-candidates. 
+Um beispielsweise den Autowire-Kandidatenstatus auf alle Beans zu beschränken, deren Name mit Repository endet, wird der Wert **\*Repository** verwendet. 
+Um mehrere Muster anzugeben, definieren Sie diese in einer durch Komma getrennten Liste. 
+Ein expliziter Wert von true oder false für das Attribut "autowire-candidate" einer Bean-Definition
 hat immer Vorrang. Für solche Beans gelten die Mustervergleichsregeln nicht.
-Diese Techniken sind nützlich für Beans, die niemals durch Autowiring in andere Beans injiziert werden sollen. Das bedeutet nicht, dass eine ausgeschlossene Bean nicht selbst mit Hilfe von Autowiring konfiguriert werden kann. Vielmehr ist die Bean selbst kein Kandidat für das Autowiring anderer Beans.
+Diese Techniken sind nützlich für Beans, die niemals durch Autowiring in andere Beans injiziert werden sollen. 
+Das bedeutet nicht, dass eine ausgeschlossene Bean nicht selbst mit Hilfe von Autowiring konfiguriert werden kann. 
+Vielmehr ist die Bean selbst kein Kandidat für das Autowiring anderer Beans.
 
 
 ## Resourcen
