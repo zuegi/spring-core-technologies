@@ -570,5 +570,15 @@ Was in der [Collections](doc/dependencies/configurations/collections.md) auch so
 ### [Autowiring Collaborators](doc/dependencies/di/autowire.md)
 
 
+### [Method Injection](https://spring.io/blog/2004/08/06/method-injection/)
+In den meisten Anwendungsszenarien sind die meisten Beans im Container Singletons. 
+Wenn eine Singleton-Bean mit einer anderen Singleton-Bean oder eine Nicht-Singleton-Bean mit einer anderen Nicht-Singleton-Bean zusammenarbeiten muss, 
+wird die Abhängigkeit normalerweise über eine Eigenschaft der anderen Bean definiert. 
+Ein Problem ergibt sich, wenn die Lebenszyklen der Beans unterschiedlich sind. 
+Angenommen, die Singleton-Bean A muss die Nicht-Singleton-Bean (Prototyp) B verwenden, vielleicht bei jedem Methodenaufruf von A. 
+Der Container erstellt die Singleton-Bean A nur einmal und hat daher nur einmal die Möglichkeit, die Eigenschaften zu setzen. 
+Der Container kann Bean A nicht jedes Mal eine neue Instanz von Bean B zur Verfügung stellen, wenn eine benötigt wird.
+
+
 ## to be completed
 

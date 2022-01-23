@@ -9,3 +9,7 @@ Die verwendete Spring Version in den Code Beispielen ist
 ````
 
 * [Der Inversion of Control Container](./ioc-container/spring-ioc-container.md)
+
+
+## Referenzen
+[Wideskills spring-tutorial](http://www.wideskills.com/spring-tutorial) - eine Übersicht
