@@ -607,7 +607,7 @@ public class EineKlasse{..}
 ````
 
 #### Web Scoped Beans (request, session, application, websocket)
-[Initial Web Configuration](doc/dependencies/di/initial_web_config.md)
+[Initial Web Configuration](/doc/dependencies/di/initial_web_config.md)
 * web.xml
 * WebApplicationInitializer interface
 
@@ -615,7 +615,12 @@ public class EineKlasse{..}
 **Die weiteren Abschnitte über die verschiedenen Scopse überspringe ich an dieser Stelle**
 
 ## Customize the Nature of a Bean
+### Lifecycle Callbacks
+* [InitializingBean and DisposableBean](doc/dependencies/di/initializing_disposable_bean.md)
+* [Initialize und Destroy Methoden](doc/dependencies/di/initialize_und_destroy_methoden.md)
 
+
+### Combining Lifecycle Mechanisms
 TODO
 
 ## to be completed
