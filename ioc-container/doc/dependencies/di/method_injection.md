@@ -178,6 +178,10 @@ Ich bin das Bean: injectedPrototypeBeanB
 Ist da  prototypeBeanA und prototypeBeanA  dasselbe ? false
 ````
 
+## Arbitrary Method Replacment
+Eine weniger nützliche Form der Methodeninjektion als die Lookup-Methodeninjektion ist die Möglichkeit, beliebige Methoden in einer verwalteten Bean durch eine andere Methodenimplementierung zu ersetzen. 
+Ich überspringe diesen Abschnitt bis  diese Funktionalität tatsächlich benötigt wird.
+ 
 
 ## Referenzen
 * [Blog über die Motivation Method Injection einzusetzen](https://spring.io/blog/2004/08/06/method-injection/)
