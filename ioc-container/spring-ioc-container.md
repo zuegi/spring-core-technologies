@@ -577,5 +577,46 @@ einmal erzeugt, was für eine PrototypeBean nicht wünschenswert ist.
 * **Singleton**: Nur ein Objekt instanziieren
 * **Prototyp**: Jedes Mal ein neues Objekt instanziieren.
 
+## Bean Scopes
+Der Gedanke, dass eine Bean-Definition ein Rezept ist, ist wichtig, da dies bedeutet, dass wie bei einer Klasse, 
+viele Objektinstanzen aus einem einzigen Rezept erstellen werden können.
+
+Beans können so definiert werden, dass sie in einem von mehreren Scopes bereitgestellt werden. 
+Das Spring Framework unterstützt sechs (registrierte) Scopes, von denen vier nur verfügbar sind, wenn Sie einen Web-aware ApplicationContext verwenden.
+
+|Scope        | Beschreibung |
+|-------------|--------------|
+| singleton   | Singleton ist der **default** Scope und besteht aus einer Bean Definition für eine einzige Bean Instanz pro Spring IoC Container. |
+| prototype   | Besteht aus einer Bean Definition zur Erstellen von x Bean Instanzen |
+| request     | Begrenzt eine einzelne Bean-Definition auf den Lebenszyklus einer einzelnen HTTP-Anfrage.Das heißt, jede HTTP-Anfrage hat ihre eigene Instanz einer Bean, die auf der Grundlage einer einzigen Bean-Definition erstellt wurde. Nur gültig im Kontext eines webfähigen Spring ApplicationContext.|
+| session     | Begrenzt eine einzelne Bean-Definition auf den Lebenszyklus einer HTTP-Sitzung. Nur gültig im Kontext eines webfähigen Spring ApplicationContext.|
+| application | Setzt eine einzelne Bean-Definition auf den Lebenszyklus eines ServletContextes. Nur gültig im Kontext eines webfähigen Spring ApplicationContext.|
+| websocket   | Begrenzt eine einzelne Bean-Definition auf den Lebenszyklus eines WebSockets. Nur gültig im Kontext eines webfähigen Spring ApplicationContext. |
+
+Zusätzlich zu den obigen sechs Scopes gibt es seit noch den thread scope der aber per default nicht registriert ist.
+
+### Spring Bean Scope erstellen
+* In einer Bean Definition wird das **scope** Attribut verwendet       
+````xml
+<bean id="bean_id" class=”class_name” scope=" ">
+````
+* Eine Annotation basierte Konfiguration im Code
+````java
+@Scope
+public class EineKlasse{..}
+````
+
+#### Web Scoped Beans (request, session, application, websocket)
+[Initial Web Configuration](doc/dependencies/di/initial_web_config.md)
+* web.xml
+* WebApplicationInitializer interface
+
+#### Custom Bean Scopes
+**Die weiteren Abschnitte über die verschiedenen Scopse überspringe ich an dieser Stelle**
+
+## Customize the Nature of a Bean
+
+TODO
+
 ## to be completed
 
