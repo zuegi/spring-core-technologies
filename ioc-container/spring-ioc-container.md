@@ -619,9 +619,10 @@ public class EineKlasse{..}
 * [InitializingBean and DisposableBean](doc/dependencies/di/initializing_disposable_bean.md)
 * [Initialize und Destroy Methoden](doc/dependencies/di/initialize_und_destroy_methoden.md)
 
+### [Combining Lifecycle Mechanisms](doc/dependencies/di/combining_lifecycle_mechanism.md)
 
-### Combining Lifecycle Mechanisms
-TODO
+
+!!!  Den Lifecycle unbedingt auflisten, was kommt wann in welcher Reihenfolge !!!
 
 ## to be completed
 
