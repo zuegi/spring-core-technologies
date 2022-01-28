@@ -639,7 +639,11 @@ SpringBeanLifecycle bean = context.getBean(SpringBeanLifecycle.class);
 bean.sayHello();
 ````
 
-### [Aware Interfaces]()
+### [Aware Interfaces](doc/dependencies/di/aware-interfaces.md)
+
+## Bean Definition Inheritance
+
+TODO
 
 ## to be completed
 
