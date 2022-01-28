@@ -621,8 +621,25 @@ public class EineKlasse{..}
 
 ### [Combining Lifecycle Mechanisms](doc/dependencies/di/combining_lifecycle_mechanism.md)
 
+### [Startup und Shutdown Callbacks](doc/dependencies/di/startup_shutdown_callbacks.md)
+Leider ist dieses Kapitel unvollständig, weil ich es noch nicht so richtig verstanden habe.
 
-!!!  Den Lifecycle unbedingt auflisten, was kommt wann in welcher Reihenfolge !!!
+### Den Spring IoC Container gracefully herunterfahren in einer Nicht-Web-Applikation
+In einer Nicht-Web-Appliktion kann der IoC Container über einen registrierten Shutdown Hook sauber heruntergefahren werden,
+wenn die JVM gestoppt wird. Dadurch wird ein geordnetes Herunterfahren sichergestellt 
+und die entsprechenden Zerstörungsmethoden für die Singleton-Beans aufgerufen, damit alle Ressourcen freigegeben werden. 
+Trotzdem müssen die Destroy-Callbacks jedoch korrekt konfiguriert und implementiert werden.
+
+Zur Implemntierung braucht es hier einen **ConfigurableApplicationContext**.
+Siehe dazu das Beispiel: [DefaultLifecycleBeanRunner](src/main/java/ch/wesr/spring/core/container/xml/dependencyinjection/lifecyclecallback/startupshutdown/DefaultLifecycleBeanRunner.java)
+````java
+ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("dependencies/lifecyclecallback/lifecycle-processor.xml");
+context.registerShutdownHook();
+SpringBeanLifecycle bean = context.getBean(SpringBeanLifecycle.class);
+bean.sayHello();
+````
+
+### [Aware Interfaces]()
 
 ## to be completed
 
