@@ -19,6 +19,7 @@
 
     <modules>
         <module>ioc-container</module>
+        <module>resources</module>
     </modules>
 
 

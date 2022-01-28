@@ -641,7 +641,7 @@ bean.sayHello();
 
 ### [Aware Interfaces](doc/dependencies/di/aware-interfaces.md)
 
-## Bean Definition Inheritance
+## [Bean Definition Inheritance](doc/bean_definition_inheritance.md)
 
 TODO
 
