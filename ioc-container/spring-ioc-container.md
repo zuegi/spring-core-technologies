@@ -643,7 +643,5 @@ bean.sayHello();
 
 ## [Bean Definition Inheritance](doc/bean_definition_inheritance.md)
 
-TODO
-
 ## to be completed
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="baseBean" class="ch.wesr.spring.core.container.xml.beaninheritance.BaseSpringBean" abstract="true">
+        <property name="baseName" value="Starte mit BaseSpringBean"/>
+    </bean>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.beaninheritance.SpringBean"
+          parent="baseBean">
+        <property name="name" value="SpringBean"/>
+    </bean>
+</beans>
