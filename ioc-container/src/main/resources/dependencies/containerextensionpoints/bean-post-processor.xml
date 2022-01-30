@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- ermögliche die Annotations @PostConstruct/@PreDestroy und weitere -->
+    <context:annotation-config/>
 
     <bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"
-          init-method="customBeanInit" destroy-method="customBeanDestroy"/>
+          init-method="customBeanInit" destroy-method="customBeanDestroy">
+        <property name="message" value="Hello from: "/>
+    </bean>
 
-    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean2"
-          init-method="customBeanInit" destroy-method="customBeanDestroy"/>
+<!--    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean2"-->
+<!--          init-method="customBeanInit" destroy-method="customBeanDestroy"/>-->
 
     <bean id="customPostProcessorBean"
           class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanPostProcessor"/>

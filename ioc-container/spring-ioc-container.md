@@ -615,7 +615,8 @@ public class EineKlasse{..}
 **Die weiteren Abschnitte über die verschiedenen Scopse überspringe ich an dieser Stelle**
 
 ## Customize the Nature of a Bean
-### Lifecycle Callbacks
+### <a name="LifecycleCallbacks"></a> Lifecycle Callbacks
+
 * [InitializingBean and DisposableBean](doc/dependencies/di/initializing_disposable_bean.md)
 * [Initialize und Destroy Methoden](doc/dependencies/di/initialize_und_destroy_methoden.md)
 
@@ -643,7 +644,7 @@ bean.sayHello();
 
 ## [Bean Definition Inheritance](doc/bean_definition_inheritance.md)
 
-## [Container Extension Point]
+## [Container Extension Point](doc/container_extension_points.md)
 Normalerweise muss ein Anwendungsentwickler keine ApplicationContext-Implementierungsklassen erstellen. 
 Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen spezieller Integrationsschnittstellen erweitert werden.
 
