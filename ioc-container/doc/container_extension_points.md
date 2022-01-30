@@ -314,7 +314,7 @@ public void customBeanDestroy() {
 ````
 
 
-## Registrierung der BeanPostProcessor Implementierungen
+## Weitere Registrierungsmöglichkeiten der BeanPostProcessor Implementierungen
 Neben der eben vorgestellten und empfohlenen Registrierung über den ApplicationContext gibt es auch programmatische Registrierungen von BeanPostProcessor Implementierungen.
 
 ### ConfigurableBeanFactory registrieren
@@ -361,7 +361,25 @@ Z.B. wird die mit @PostConstruct annotierte Methode nicht ausgeführt. Ebenso gi
 	Hello from: SpringBean
 ```
 
-### AOP autoproxying
+### BeanPostProcessor-Instanzen und AOP autoproxying
+
+Klassen, die die BeanPostProcessor-Schnittstelle implementieren, sind besonders und werden vom Container anders behandelt. 
+Alle BeanPostProcessor-Instanzen und Beans, die sie direkt referenzieren, werden beim Start als Teil 
+der speziellen Startphase des ApplicationContextes instanziiert. 
+Anschließend werden alle BeanPostProcessor-Instanzen sortiert registriert und auf alle weiteren Beans im Container angewendet. 
+Da das Auto-Proxying von AOP als BeanPostProcessor selbst implementiert wird, kommen weder BeanPostProcessor-Instanzen noch die Beans, 
+auf die sie direkt verweisen, für das Auto-Proxying in Frage, so dass keine Aspekte in sie eingewoben sind.
+
+Im Klartext - BeanPostProcessor Implementierungen funktionieren nicht für das AOP auto-proxying.
+
+
+### Das AutowiredAnnotationBeanPostProcessor Interface
+Die Verwendung von Callback-Schnittstellen oder Annotationen in Verbindung mit einer benutzerdefinierten BeanPostProcessor-Implementierung
+ist ein gängiges Mittel zur Erweiterung des Spring IoC-Containers. 
+Ein Beispiel ist der AutowiredAnnotationBeanPostProcessor von Spring - eine BeanPostProcessor-Implementierung, 
+die mit der Spring-Distribution ausgeliefert wird und annotierte Felder, Setter-Methoden und beliebige Konfigurationsmethoden autowired.
+
+
 
 ## Container Erweiterung mit dem BeanFactoryPostProcessor Interface
 
