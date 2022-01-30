@@ -1,5 +1,13 @@
 # Spring Bean Container Extensions Points Beispiel
 
+BeanPostProcessor-Instanzen sind pro Container skaliert. Dies ist nur relevant, wenn Container-Hierarchien verwendet werden.
+In einem Container definierte BeanPostProcessors, verarbeiten nur die Beans in diesem Container. 
+Mit anderen Worten: Beans, die in einem Container definiert sind, werden von einem BeanPostProcessor, der in einem anderen Container definiert ist, nicht nachbearbeitet, selbst wenn beide Container Teil derselben Hierarchie sind.
+
+Zudem können mehrere BeanPostProcessor-Instanzen konfiguriert werden.
+Die Reihenfolge, in der diese BeanPostProcessor-Instanzen ausgeführt werden, durch Festlegen der Eigenschaft **order** steuern. 
+Diese Eigenschaft kann nur festlegt werden, wenn der BeanPostProcessor die Schnittstelle **Ordered** implementiert. 
+
 Der Spring IoC Container kann auf x verschiedene Arten erweitert werden.
 
 * BeanPostProcessor
@@ -25,9 +33,9 @@ Für jede Bean-Instanz, die vom Container erzeugt wird, erhält die BeanPostProc
 vor dem Aufruf der Container-Initialisierungsmethoden als auch nach dem Aufruf der Bean-Initialisierungsmethoden (siehe [Lifecyce Callbacks]((../spring-ioc-container.md#LifecycleCallbacks)))
 einen Callback vom Container.
 
-### Registrierung einer Custom BeanPostProcessor Bean
+### Registrierung einer Custom BeanPostProcessor Bean über den ApplicationContext
 Ein ApplicationContext erkennt automatisch alle Beans, die in den Konfigurationsmetadaten [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcessor.java)
-definiert sind und das BeanPostProcessor Interface implementieren. In unserem Beispiel ist das die **CustomBeanPostProcessor** Baean.
+definiert sind und das BeanPostProcessor Interface implementieren. In unserem Beispiel ist das die **CustomBeanPostProcessor** Bean.
 Der Container bzw. ApplicationContext registriert diese Beans als Postprozessoren, damit sie später bei der Bean-Erstellung aufgerufen werden können.
 
 Dann übergibt Spring jede Bean-Instanz an diese beiden Methoden vor und nach dem Aufruf der Initialisierungs-Callback-Methode,
@@ -305,6 +313,55 @@ public void customBeanDestroy() {
 }    
 ````
 
+
+## Registrierung der BeanPostProcessor Implementierungen
+Neben der eben vorgestellten und empfohlenen Registrierung über den ApplicationContext gibt es auch programmatische Registrierungen von BeanPostProcessor Implementierungen.
+
+### ConfigurableBeanFactory registrieren
+Ich verstehe diesen Ansatz noch nicht ganz, aber der grosse Unterschied ist der die main Methode der Klasse 
+[ConfigurableBeanFactoryRunner.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/ConfigurableBeanFactoryRunner.java)
+
+!Beachte!
+Hier wird keine ApplicationContext verwendet, sondern das xml über eine ClassPathResource an eine ConfigurableBeanFactory übergeben,
+welche dann die Instanzierung des [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcessor.java)
+und der [SpringBean.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java) übernimmt.
+````java
+ public static void main(String[] args) {
+        
+        ClassPathResource classPathResource = new ClassPathResource("dependencies/containerextensionpoints/bean-post-processor.xml");
+        ConfigurableBeanFactory configurableBeanFactory = new XmlBeanFactory(classPathResource);
+        CustomBeanPostProcessor customPostProcessorBean = (CustomBeanPostProcessor) configurableBeanFactory.getBean("customPostProcessorBean");
+
+        configurableBeanFactory.addBeanPostProcessor(customPostProcessorBean);
+
+        SpringBean springBean = (SpringBean) configurableBeanFactory.getBean("springBean");
+        springBean.sayHello();
+
+
+    }
+````
+Und weil es **kein ApplicationContext** gibt, sieht auch der Output ein wenig anders aus.
+Z.B. wird die mit @PostConstruct annotierte Methode nicht ausgeführt. Ebenso gibt es **keinen ShutdownHook**.
+```text
+1. Eine Bean-Instanz wird entweder über einen Konstruktor oder durch eine Fabrikmethode erstellt.
+	SpringBean wird über den Konstruktor initalisiert
+2. Setzen der Werte und Bean-Referenzen für die Bean-Eigenschaften
+	message: Hello from: 
+3. Aufruf der Setter-Methoden, die in allen bekannten Schnittstellen definiert sind
+	SpringBean.setBeanName(springBean) aufgerufen aus dem BeanNameAware Interface
+4. Übergabe der Bean-Instanz an die Methode postProcessBeforeInitialization() jedes Bean-Postprozessors
+	CustomBeanPostProcessor.postProcessBeforeInitialization() aufgerufen für: SpringBean, beanName: springBean
+5.2. InitializingBean.afterSetProperties()
+	SpringBean.afterPropertiesSet(): aufgerufen aus dem InitializingBean
+5.3. Setter Methode über das Bean Definition Attribut init-method="customBeanInit()"
+	SpringBean.customBeanInit(): aufgerufen über das Bean Defintion Attribut init-method customBeanInit() 
+6. Übergabe der Bean-Instanz an die postProcessAfterInitialization()-Methode jedes Bean-Postprozessors
+	CustomBeanPostProcessor.postProcessAfterInitialization() aufgerufen für: SpringBean, beanNamespringBean
+7. Die Bean ist bereit, verwendet zu werden 
+	Hello from: SpringBean
+```
+
+### AOP autoproxying
 
 ## Container Erweiterung mit dem BeanFactoryPostProcessor Interface
 

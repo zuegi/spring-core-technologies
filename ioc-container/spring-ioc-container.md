@@ -644,7 +644,7 @@ bean.sayHello();
 
 ## [Bean Definition Inheritance](doc/bean_definition_inheritance.md)
 
-## [Container Extension Point](doc/container_extension_points.md)
+## [Container Extension Points](doc/container_extension_points.md)
 Normalerweise muss ein Anwendungsentwickler keine ApplicationContext-Implementierungsklassen erstellen. 
 Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen spezieller Integrationsschnittstellen erweitert werden.
 
