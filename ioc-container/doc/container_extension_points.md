@@ -1,6 +1,6 @@
 # Spring Bean Container Extensions Points Beispiel
 
-BeanPostProcessor-Instanzen sind pro Container skaliert. Dies ist nur relevant, wenn Container-Hierarchien verwendet werden.
+BeanPostProcessor und BeanPostFactoryProcessor Instanzen sind pro Container skaliert. Dies ist nur relevant, wenn Container-Hierarchien verwendet werden.
 In einem Container definierte BeanPostProcessors, verarbeiten nur die Beans in diesem Container. 
 Mit anderen Worten: Beans, die in einem Container definiert sind, werden von einem BeanPostProcessor, der in einem anderen Container definiert ist, nicht nachbearbeitet, selbst wenn beide Container Teil derselben Hierarchie sind.
 
@@ -11,6 +11,7 @@ Diese Eigenschaft kann nur festlegt werden, wenn der BeanPostProcessor die Schni
 Der Spring IoC Container kann auf x verschiedene Arten erweitert werden.
 
 * BeanPostProcessor
+* BeanPostFactoryProcessor
 
 ## Container Erweiterung mit dem BeanPostProcessor Interface
 
@@ -55,8 +56,8 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
     }
 }
 ````
-### [bean-post-processor.xml](src/main/resources/dependencies/containerextensionpoints/bean-post-processor.xml)
-In der [bean-post-processor.xml](src/main/resources/dependencies/containerextensionpoints/bean-post-processor.xml) sind die beiden Beans
+### [bean-post-processor.xml](../src/main/resources/dependencies/containerextensionpoints/bean-post-processor.xml)
+In der [bean-post-processor.xml](../src/main/resources/dependencies/containerextensionpoints/bean-post-processor.xml) sind die beiden Beans
 **SpringBean** und **SpringBean2** konfiguriert, welche dann an die Methoden  
 * postProcessBeforeInitialization()
 * postProcessAfterInitialization()
@@ -75,7 +76,7 @@ des [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/containe
           class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanPostProcessor"/>
 ````
 
-### [SpringBean.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java)
+### [SpringBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java)
 Zur Veranschaulichung wann, welche Callbacks ausgeführt werden, hat das **SpringBean** die verschiedenen Möglichkeiten 
 der [Lifecycle Callbacks](../spring-ioc-container.md#LifecycleCallbacks) implementiert.
 ````java
@@ -146,7 +147,7 @@ public class SpringBean implements InitializingBean, DisposableBean {
 }
 ````
 
-### [CustomBeanPostProcesserRunner.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcesserRunner.java)
+### [CustomBeanPostProcesserRunner.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcesserRunner.java)
 ````java
  public static void main(String[] args) {
     ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/bean-post-processor.xml");
@@ -319,12 +320,12 @@ Neben der eben vorgestellten und empfohlenen Registrierung über den Application
 
 ### ConfigurableBeanFactory registrieren
 Ich verstehe diesen Ansatz noch nicht ganz, aber der grosse Unterschied ist der die main Methode der Klasse 
-[ConfigurableBeanFactoryRunner.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/ConfigurableBeanFactoryRunner.java)
+[ConfigurableBeanFactoryRunner.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/ConfigurableBeanFactoryRunner.java)
 
 !Beachte!
 Hier wird keine ApplicationContext verwendet, sondern das xml über eine ClassPathResource an eine ConfigurableBeanFactory übergeben,
 welche dann die Instanzierung des [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcessor.java)
-und der [SpringBean.java](src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java) übernimmt.
+und der [SpringBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java) übernimmt.
 ````java
  public static void main(String[] args) {
         
@@ -380,8 +381,21 @@ Ein Beispiel ist der AutowiredAnnotationBeanPostProcessor von Spring - eine Bean
 die mit der Spring-Distribution ausgeliefert wird und annotierte Felder, Setter-Methoden und beliebige Konfigurationsmethoden autowired.
 
 
-
 ## Container Erweiterung mit dem BeanFactoryPostProcessor Interface
+Ein weitere Extension Point ist das BeanFactoryPostProcessor. 
+Die Semantik dieses Interface ist ähnlich wie die des BeanPostProcessors, mit einem wesentlichen Unterschied: 
+Der BeanFactoryPostProcessor arbeitet mit den Metadaten der Bean-Konfiguration. 
+Das heißt, der Spring IoC-Container lässt einen BeanFactoryPostProcessor die Konfigurationsmetadaten lesen und möglicherweise ändern, 
+bevor der Container andere Beans als BeanFactoryPostProcessor-Instanzen instanziiert.
+Der BeanFactoryPostProcessor ist als zum Anpassen/Verändern von Konfigurationsdaten (xml).
+
+Man kan mehrere BeanFactoryPostProcessor-Instanzen konfigurieren, und die Reihenfolge, 
+in der diese BeanFactoryPostProcessor-Instanzen ausgeführt werden, durch Festlegen der Eigenschaft/Property **order** steuern. 
+Jedoch nur dann, wenn der BeanFactoryPostProcessor das **Interface Ordered** implementiert.
+
+Spring enthält eine Reihe von vordefinierten BeanFactory-Postprozessoren, wie **PropertyOverrideConfigurer** und **PropertySourcesPlaceholderConfigurer**.
+Es kann auch  einen benutzerdefinierten BeanFactoryPostProcessor verwendet - zum Beispiel, 
+um benutzerdefinierte Eigenschaftseditoren zu registrieren.
 
 
 
