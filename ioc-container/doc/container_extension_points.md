@@ -10,8 +10,9 @@ Diese Eigenschaft kann nur festlegt werden, wenn der BeanPostProcessor die Schni
 
 Der Spring IoC Container kann auf x verschiedene Arten erweitert werden.
 
-* BeanPostProcessor
-* BeanPostFactoryProcessor
+* **BeanPostProcessor**
+* **BeanPostFactoryProcessor**
+* **FactoryBean**
 
 ## Container Erweiterung mit dem BeanPostProcessor Interface
 
@@ -397,6 +398,82 @@ Spring enthält eine Reihe von vordefinierten BeanFactory-Postprozessoren, wie *
 Es kann auch  einen benutzerdefinierten BeanFactoryPostProcessor verwendet - zum Beispiel, 
 um benutzerdefinierte Eigenschaftseditoren zu registrieren.
 
+### [bean-factory-post-processor.xml](../src/main/resources/dependencies/containerextensionpoints/bean-factory-post-processor.xml)
+````xml
+<bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"/>
+
+<bean id="customPostProcessorBean"
+      class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanFactoryPostProcessor"/>
+````
+
+### [SpringBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java)
+Das SpringBean bleibt dasselbe wie oben, deshalb hier nur der Link zum Bean.
+
+### [CustomBeanFactoryPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanFactoryPostProcessor.java)
+````java
+public class CustomBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory configurableListableBeanFactory) throws BeansException {
+        String newMessage = "Das ist eine in der Bean Definition veränderte \"Hello from\" Message";
+
+        System.out.println("Die Bean Defintion wird gelesen bevor Instanzen erstellt werden.");
+        System.out.println("\t" +this.getClass().getSimpleName() +".postProcessBeanFactory() aufgerufen und das Property message wird gesetzt mit: " +newMessage);
+
+        // tu das nicht, es verletzt den Container Lifecycle
+//        SpringBean springBean = (SpringBean) configurableListableBeanFactory.getBean("springBean");
+//        springBean.setMessage("Das ist eine verändertet Hello from Message:");
+
+        PropertyValue pv = new PropertyValue("message", newMessage);
+
+        BeanDefinition springBeanDefinition = configurableListableBeanFactory.getBeanDefinition("springBean");
+        springBeanDefinition .getPropertyValues().addPropertyValue(pv);
+
+    }
+}
+````
+
+### [CustomBeanFactoryPostProcessorRunner.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanFactoryPostProcessorRunner.java)
+````java
+public static void main(String[] args) {
+    ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/bean-factory-post-processor.xml");
+    context.registerShutdownHook();
+
+    SpringBean bean = (SpringBean) context.getBean("springBean");
+    bean.sayHello();
+}
+````
+### output
+````text
+Die Bean Defintion wird gelesen bevor Instanzen erstellt werden.
+	CustomBeanFactoryPostProcessor.postProcessBeanFactory() aufgerufen und das Property message wird gesetzt mit: Das ist eine in der Bean Definition veränderte "Hello from" Message
+1. Eine Bean-Instanz wird entweder über einen Konstruktor oder durch eine Fabrikmethode erstellt.
+	SpringBean wird über den Konstruktor initalisiert
+2. Setzen der Werte und Bean-Referenzen für die Bean-Eigenschaften
+	message: Das ist eine in der Bean Definition veränderte "Hello from" Message
+3. Aufruf der Setter-Methoden, die in allen bekannten Schnittstellen definiert sind
+	SpringBean.setBeanName(springBean) aufgerufen aus dem BeanNameAware Interface
+5.2. InitializingBean.afterSetProperties()
+	SpringBean.afterPropertiesSet(): aufgerufen aus dem InitializingBean
+7. Die Bean ist bereit, verwendet zu werden 
+	Das ist eine in der Bean Definition veränderte "Hello from" MessageSpringBean
+8.2 Aufruf der destroy() Methode aus dem DisposableBean Interface
+	SpringBean.destroy(): aufgerufen  aus dem DisposableBean
+````
+
+## Customizing Instantiation Logic with a FactoryBean
+Eine FactoryBean ist eine Bean, die als Factory für die Erstellung anderer Beans innerhalb des IoC-Containers dient. 
+Vom Konzept her ist eine FactoryBean einer Factory-Methode sehr ähnlich, aber es handelt sich um 
+eine Spring-spezifische Bean, die vom Spring-IoC-Container während der Bean-Konstruktion identifiziert 
+und vom Container zur Instanziierung anderer Beans verwendet werden kann.
+Factory Beans werden meist zur Implementierung von Framework-Funktionen verwendet. Hier sind einige Beispiele:
+
+### Warum eine FactoryBean verwenden?
+* Wenn Sie ein Objekt (z. B. eine Datenquelle) über JNDI suchen, können Sie JndiObjectFactoryBean verwenden.
+* Wenn Sie klassisches Spring AOP verwenden, um einen Proxy für eine Bean zu erstellen, können Sie ProxyFactoryBean verwenden.
+* Wenn Sie eine Hibernate-Sitzungsfabrik im IoC-Container erstellen, können Sie LocalSessionFactoryBean verwenden.
+
+In den meisten Fällen wird man nur selten benutzerdefinierte Factory Beans schreiben müssen, 
+da diese Framework-spezifisch sind und nicht außerhalb des Spring IoC-Containers verwendet werden können.
 
 
 ## Referenzen
@@ -405,5 +482,6 @@ um benutzerdefinierte Eigenschaftseditoren zu registrieren.
 * [tutorialspoint - Spring BeanPostProcessor](https://www.tutorialspoint.com/spring/spring_bean_post_processors.htm)
 * [JavaDevJournal - Spring BeanPostProcessor](https://www.javadevjournal.com/spring/spring-bean-post-processor/)
 
+* [Spring Blog What's a FactoryBean](https://spring.io/blog/2011/08/09/what-s-a-factorybean)
 
 ## [zurück zu spring-ioc-container](../../../spring-ioc-container.md)
