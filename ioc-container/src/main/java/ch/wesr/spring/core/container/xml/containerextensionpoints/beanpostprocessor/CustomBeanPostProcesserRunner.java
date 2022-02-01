@@ -1,5 +1,6 @@
-package ch.wesr.spring.core.container.xml.containerextensionpoints;
+package ch.wesr.spring.core.container.xml.containerextensionpoints.beanpostprocessor;
 
+import ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

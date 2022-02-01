@@ -1,5 +1,7 @@
-package ch.wesr.spring.core.container.xml.containerextensionpoints;
+package ch.wesr.spring.core.container.xml.containerextensionpoints.beanpostprocessor;
 
+import ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean;
+import ch.wesr.spring.core.container.xml.containerextensionpoints.beanpostprocessor.CustomBeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.core.io.ClassPathResource;

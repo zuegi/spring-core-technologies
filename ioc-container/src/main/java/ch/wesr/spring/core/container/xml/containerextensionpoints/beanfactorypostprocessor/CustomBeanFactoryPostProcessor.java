@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.xml.containerextensionpoints;
+package ch.wesr.spring.core.container.xml.containerextensionpoints.beanfactorypostprocessor;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValue;

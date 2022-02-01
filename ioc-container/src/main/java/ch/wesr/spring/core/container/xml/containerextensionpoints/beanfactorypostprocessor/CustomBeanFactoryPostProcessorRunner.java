@@ -1,5 +1,6 @@
-package ch.wesr.spring.core.container.xml.containerextensionpoints;
+package ch.wesr.spring.core.container.xml.containerextensionpoints.beanfactorypostprocessor;
 
+import ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;

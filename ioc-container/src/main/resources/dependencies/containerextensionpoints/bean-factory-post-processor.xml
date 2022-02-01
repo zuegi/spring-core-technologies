@@ -10,5 +10,5 @@
     <bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"/>
 
     <bean id="customPostProcessorBean"
-          class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanFactoryPostProcessor"/>
+          class="ch.wesr.spring.core.container.xml.containerextensionpoints.beanfactorypostprocessor.CustomBeanFactoryPostProcessor"/>
 </beans>

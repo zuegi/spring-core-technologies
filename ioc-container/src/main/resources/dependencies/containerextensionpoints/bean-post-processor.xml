@@ -11,11 +11,11 @@
     <!-- ermögliche die Annotations @PostConstruct/@PreDestroy und weitere -->
     <context:annotation-config/>
 
-
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"/>
 
 <!--    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean2"-->
 <!--          init-method="customBeanInit" destroy-method="customBeanDestroy"/>-->
 
     <bean id="customPostProcessorBean"
-          class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanPostProcessor"/>
+          class="ch.wesr.spring.core.container.xml.containerextensionpoints.beanpostprocessor.CustomBeanPostProcessor"/>
 </beans>

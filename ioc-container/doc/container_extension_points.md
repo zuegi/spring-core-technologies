@@ -11,6 +11,7 @@ Diese Eigenschaft kann nur festlegt werden, wenn der BeanPostProcessor die Schni
 Der Spring IoC Container kann auf x verschiedene Arten erweitert werden.
 
 * **BeanPostProcessor**
+* **ConfigurableBeanFactory**
 * **BeanPostFactoryProcessor**
 * **FactoryBean**
 
@@ -36,13 +37,13 @@ vor dem Aufruf der Container-Initialisierungsmethoden als auch nach dem Aufruf d
 einen Callback vom Container.
 
 ### Registrierung einer Custom BeanPostProcessor Bean über den ApplicationContext
-Ein ApplicationContext erkennt automatisch alle Beans, die in den Konfigurationsmetadaten [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcessor.java)
+Ein ApplicationContext erkennt automatisch alle Beans, die in den Konfigurationsmetadaten [bean-post-processor.xml](../src/main/resources/dependencies/containerextensionpoints/bean-post-processor.xml)
 definiert sind und das BeanPostProcessor Interface implementieren. In unserem Beispiel ist das die **CustomBeanPostProcessor** Bean.
 Der Container bzw. ApplicationContext registriert diese Beans als Postprozessoren, damit sie später bei der Bean-Erstellung aufgerufen werden können.
 
 Dann übergibt Spring jede Bean-Instanz an diese beiden Methoden vor und nach dem Aufruf der Initialisierungs-Callback-Methode,
 in der Sie die Bean-Instanz nach Belieben verarbeiten können.
-### [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomBeanPostProcessor.java)
+### [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/beanpostprocessor/CustomBeanPostProcessor.java)
 ````java
 public class CustomBeanPostProcessor implements BeanPostProcessor {
 
@@ -67,14 +68,15 @@ des [CustomBeanPostProcessor.java](../src/main/java/ch/wesr/spring/core/containe
 übergeben werden und verarbeitet werden können.
 
 ````xml
- <bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"
-          init-method="customBeanInit" destroy-method="customBeanDestroy"/>
 
-    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean2"
-          init-method="customBeanInit" destroy-method="customBeanDestroy"/>
+<bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"
+      init-method="customBeanInit" destroy-method="customBeanDestroy"/>
 
-    <bean id="customPostProcessorBean"
-          class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanPostProcessor"/>
+<bean id="springBean2" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean2"
+      init-method="customBeanInit" destroy-method="customBeanDestroy"/>
+
+<bean id="customPostProcessorBean"
+      class="ch.wesr.spring.core.container.xml.containerextensionpoints.beanpostprocessor.CustomBeanPostProcessor"/>
 ````
 
 ### [SpringBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java)
@@ -399,11 +401,13 @@ Es kann auch  einen benutzerdefinierten BeanFactoryPostProcessor verwendet - zum
 um benutzerdefinierte Eigenschaftseditoren zu registrieren.
 
 ### [bean-factory-post-processor.xml](../src/main/resources/dependencies/containerextensionpoints/bean-factory-post-processor.xml)
+
 ````xml
+
 <bean id="springBean" class="ch.wesr.spring.core.container.xml.containerextensionpoints.SpringBean"/>
 
 <bean id="customPostProcessorBean"
-      class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomBeanFactoryPostProcessor"/>
+      class="ch.wesr.spring.core.container.xml.containerextensionpoints.beanfactorypostprocessor.CustomBeanFactoryPostProcessor"/>
 ````
 
 ### [SpringBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/SpringBean.java)
@@ -477,8 +481,11 @@ da diese Framework-spezifisch sind und nicht außerhalb des Spring IoC-Container
 
 In diesem sehr einfachen Beispiel gibt es nur die CustomFactoryBean, welche 2 Properties übergeben bekommt.
 ### [factory-bean.xml](../src/main/resources/dependencies/containerextensionpoints/factory-bean.xml)
+
 ````xml
- <bean class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomFactoryBean" id="customFactoryBean">
+
+<bean class="ch.wesr.spring.core.container.xml.containerextensionpoints.factorybean.CustomFactoryBean"
+      id="customFactoryBean">
     <property name="message" value="Hello from SpringBean"/>
     <property name="beanName" value="SpringBeanName"/>
 </bean>
@@ -534,6 +541,7 @@ Für eine gegebene CustomFactoryBean mit der **ID "customFactoryBean"** gibt der
 ````java
 public static void main(String[] args) throws Exception {
         ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/factory-bean.xml");
+        // erhalte das Produkt der customBeanFactory - springBean1
         SpringBean springBean1 = (SpringBean) context.getBean("customFactoryBean");
         springBean1.sayHello();
     }
@@ -544,7 +552,7 @@ des ApplicationContext das kaufmännische Und-Symbol (**&**) voran.
 ```java
  public static void main(String[] args) throws Exception {
     ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/factory-bean.xml");
-
+    // erhalte die Instanz der customBeanFactory aufgrund des (&) Zeichen in der getBean() Methoden
     CustomFactoryBean customFactoryBean = (CustomFactoryBean) context.getBean("&customFactoryBean");
     SpringBean springBean = customFactoryBean.getObject();
     springBean.sayHello();
