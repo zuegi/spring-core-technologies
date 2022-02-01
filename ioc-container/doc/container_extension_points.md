@@ -475,6 +475,93 @@ Factory Beans werden meist zur Implementierung von Framework-Funktionen verwende
 In den meisten Fällen wird man nur selten benutzerdefinierte Factory Beans schreiben müssen, 
 da diese Framework-spezifisch sind und nicht außerhalb des Spring IoC-Containers verwendet werden können.
 
+In diesem sehr einfachen Beispiel gibt es nur die CustomFactoryBean, welche 2 Properties übergeben bekommt.
+### [factory-bean.xml](../src/main/resources/dependencies/containerextensionpoints/factory-bean.xml)
+````xml
+ <bean class="ch.wesr.spring.core.container.xml.containerextensionpoints.CustomFactoryBean" id="customFactoryBean">
+    <property name="message" value="Hello from SpringBean"/>
+    <property name="beanName" value="SpringBeanName"/>
+</bean>
+````
+
+### [CustomFactoryBean.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomFactoryBean.java)
+Die CustomFactoryBean selber implementiert die FactoryBean<SpringBean>, welche die 3 Methoden zu implementieren hat.
+* T getObject() throws Exception;
+* Class<T> getObjectType();
+* boolean isSingleton();
+
+Dabei ist vorallem die **getObject()** beachtenswert, weil diese das effektive Objekt, in diesem *einfachen* Fall die SpringBean erzeugt.
+
+````java
+public class CustomFactoryBean implements FactoryBean<SpringBean> {
+
+    private String message;
+    private String beanName;
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
+    @Override
+    public SpringBean getObject() throws Exception {
+        // stark vereinfacht hier um zu zeigen wie es geht
+        SpringBean springBean = new SpringBean();
+        springBean.setMessage(message);
+        springBean.setBeanName(beanName);
+
+        return springBean;
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return SpringBean.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return FactoryBean.super.isSingleton();
+    }
+}
+````
+
+### [CustomFactoryBeanRunner.java](../src/main/java/ch/wesr/spring/core/container/xml/containerextensionpoints/CustomFactoryBeanRunner.java)
+
+Für eine gegebene CustomFactoryBean mit der **ID "customFactoryBean"** gibt der Aufruf von **getBean("customFactoryBean")** im Container also das **Produkt der CustomFactoryBean** zurück - **SpringBean**.
+````java
+public static void main(String[] args) throws Exception {
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/factory-bean.xml");
+        SpringBean springBean1 = (SpringBean) context.getBean("customFactoryBean");
+        springBean1.sayHello();
+    }
+````
+
+Wenn man den Container nach einer tatsächlichen FactoryBean Instanz befragen möchte, so wird Bean-ID beim Aufruf der getBean()-Methode 
+des ApplicationContext das kaufmännische Und-Symbol (**&**) voran.
+```java
+ public static void main(String[] args) throws Exception {
+    ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/containerextensionpoints/factory-bean.xml");
+
+    CustomFactoryBean customFactoryBean = (CustomFactoryBean) context.getBean("&customFactoryBean");
+    SpringBean springBean = customFactoryBean.getObject();
+    springBean.sayHello();
+
+}
+```
+### output
+````text
+1. Eine Bean-Instanz wird entweder über einen Konstruktor oder durch eine Fabrikmethode erstellt.
+	SpringBean wird über den Konstruktor initalisiert
+2. Setzen der Werte und Bean-Referenzen für die Bean-Eigenschaften
+	message: Hello from SpringBean
+3. Aufruf der Setter-Methoden, die in allen bekannten Schnittstellen definiert sind
+	SpringBean.setBeanName(SpringBeanName) aufgerufen aus dem BeanNameAware Interface
+7. Die Bean ist bereit, verwendet zu werden 
+	Hello from SpringBeanSpringBean
+````
 
 ## Referenzen
 * [How to do it in java - Spring BeanPostProcessor](https://howtodoinjava.com/spring-core/spring-bean-post-processors/)
