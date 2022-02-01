@@ -157,4 +157,4 @@ public static void main(String[] args){
 * [Spring Guru - spring-bean-definition-inheritance](https://springframework.guru/spring-bean-definition-inheritance/)
 
 
-## [zurück zu spring-ioc-container](../../../spring-ioc-container.md)
+## [zurück zu spring-ioc-container](../spring-ioc-container.md)

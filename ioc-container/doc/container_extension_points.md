@@ -579,4 +579,4 @@ des ApplicationContext das kaufmännische Und-Symbol (**&**) voran.
 
 * [Spring Blog What's a FactoryBean](https://spring.io/blog/2011/08/09/what-s-a-factorybean)
 
-## [zurück zu spring-ioc-container](../../../spring-ioc-container.md)
+## [zurück zu spring-ioc-container](../spring-ioc-container.md)
