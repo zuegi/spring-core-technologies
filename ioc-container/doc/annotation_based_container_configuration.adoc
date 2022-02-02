@@ -16,6 +16,10 @@ Folgende Annotationen werden wir in diesem Abschnit beleuchten:
 [source,xml]
 include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[annotation-based.xml]
 
+== link:{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
+[source,java]
+include::{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
+
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
 * https://www.tutorialspoint.com/spring/spring_annotation_based_configuration.htm[Tutorialspoint - Spring Annotation Based Configuration]
