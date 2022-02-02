@@ -648,7 +648,7 @@ bean.sayHello();
 Normalerweise muss ein Anwendungsentwickler keine ApplicationContext-Implementierungsklassen erstellen. 
 Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen spezieller Integrationsschnittstellen erweitert werden.
 
-## [Annotation based Container Configuration](doc/annotation_based_container_configuration.md)
+## [Annotation based Container Configuration](doc/annotation_based_container_configuration.adoc)
 
 ## to be completed
 
