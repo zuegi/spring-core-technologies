@@ -13,10 +13,12 @@ Folgende Annotationen werden wir in diesem Abschnit beleuchten:
 * JSR-250 Annotations (@Resource, @PreDestroy und @PostConstruct)
 
 == link:{resourcedir}/dependencies/annotation-based/annotation-based.xml[Konfig Metadata]
+
 [source,xml]
 include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[annotation-based.xml]
 
 == link:{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
+
 [source,java]
 include::{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
 
