@@ -15,6 +15,7 @@ Folgende Annotationen werden wir in diesem Abschnit beleuchten:
 
 == link:{resourcedir}/dependencies/annotation-based/annotation-based.xml[Konfig Metadata]
 
+
 [source,xml]
 ----
 include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[]
@@ -22,9 +23,16 @@ include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[]
 
 == link:{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
 
+
 [source, java]
 ----
 include::{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[]
+----
+
+
+[source, java]
+----
+include::../src/main/java/ch/wesr/spring/core/container/annotation/based/SpringBean.java[]
 ----
 
 == Referenzen
