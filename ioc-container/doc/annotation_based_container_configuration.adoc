@@ -2,6 +2,7 @@
 :sourcedir: ../src/main/java
 :resourcedir: ../src/main/resources
 :docudir: ..
+:toc:
 
 In der annotation-based Konfiguration von Spring Framework, gibt es die Möglichkeit eine  Bean-Konfiguration in eine Komponentenklasse zu verschieben, anstatt XML für die Beschreibung der Bean-Verdrahtung zu verwenden. Dies geschieht durch die Verwendung von Annotationen für die entsprechende Klasse, Methode oder Felddeklaration. Vor der Durchführung von XML wird die Injektion von Annotationen durchgeführt. Daher wird die letztere die frühere Konfiguration für die Eigenschaften außer Kraft setzen bzw. überschreiben.
 
@@ -15,12 +16,16 @@ Folgende Annotationen werden wir in diesem Abschnit beleuchten:
 == link:{resourcedir}/dependencies/annotation-based/annotation-based.xml[Konfig Metadata]
 
 [source,xml]
-include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[annotation-based.xml]
+----
+include::{resourcedir}/dependencies/annotation-based/annotation-based.xml[]
+----
 
 == link:{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
 
-[source,java]
-include::{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
+[source, java]
+----
+include::{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[]
+----
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
