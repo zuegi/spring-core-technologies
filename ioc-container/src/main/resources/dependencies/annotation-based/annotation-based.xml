@@ -8,4 +8,6 @@
       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config/>
     <!-- bean definitions go here -->
+    <bean id="springBeanExplorer" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBeanExplorer"/>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBean"/>
 </beans>

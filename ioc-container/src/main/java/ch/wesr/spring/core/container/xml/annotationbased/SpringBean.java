@@ -1,9 +1,17 @@
-package ch.wesr.spring.core.container.annotation.based;
+package ch.wesr.spring.core.container.xml.annotationbased;
 
+
+import lombok.ToString;
+
+@ToString
 public class SpringBean {
 
     private String objectName;
     private String klasse;
+
+    public void sayHello() {
+        System.out.println(this);
+    }
 
     public String getObjectName() {
         return objectName;
@@ -20,4 +28,5 @@ public class SpringBean {
     public void setKlasse(String klasse) {
         this.klasse = klasse;
     }
+
 }

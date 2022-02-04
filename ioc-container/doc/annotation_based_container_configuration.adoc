@@ -2,19 +2,40 @@
 :sourcedir: ../src/main/java
 :resourcedir: ../src/main/resources
 :docudir: ..
-:toc:
+:toc: left
 
-In der annotation-based Konfiguration von Spring Framework, gibt es die Möglichkeit eine  Bean-Konfiguration in eine Komponentenklasse zu verschieben, anstatt XML für die Beschreibung der Bean-Verdrahtung zu verwenden. Dies geschieht durch die Verwendung von Annotationen für die entsprechende Klasse, Methode oder Felddeklaration. Vor der Durchführung von XML wird die Injektion von Annotationen durchgeführt. Daher wird die letztere die frühere Konfiguration für die Eigenschaften außer Kraft setzen bzw. überschreiben.
+In der annotation-based Konfiguration von Spring Framework, gibt es die Möglichkeit eine Bean-Konfiguration in eine Komponentenklasse zu verschieben, anstatt XML für die Beschreibung der Bean-Verdrahtung zu verwenden. Dies geschieht durch die Verwendung von Annotationen für die entsprechende Klasse, Methode oder Felddeklaration.
+Die Annotation Injection geschieht bevor der XML Injection. Somit überschreibt die XML Injection die Annotations-Eigenschaften.
 
-Folgende Annotationen werden wir in diesem Abschnit beleuchten:
+== Das <context:annotation-config/> Element in der XML Konfiguration
+Wie immer könnte man sich die PostProcesser Beans als individuelle Beans definieren (
+
+!!!!!! TODO:siehe Beispiel lslsl
+
+).
+Es geht aber auch über das XLML Element *<context:annotation-config/>* und dem *context* Namespace
+http://www.springframework.org/schema/context
+https://www.springframework.org/schema/context/spring-context.xsd
+
+Mit der <context:annotation-config/> werden implizit folgende PostProcesserBeans registriert
+
+* ConfigurationClassPostProcessor
+* AutowiredAnnotationBeanPostProcessor
+* CommonAnnotationBeanPostProcessor
+* PersistenceAnnotationBeanPostProcessor
+* EventListenerMethodProcessor
+
+
+Folgende Annotationen werde ich in diesem Abschnit beleuchten:
 
 * @Required
 * @Autowired
 * @Qualifier
 * JSR-250 Annotations (@Resource, @PreDestroy und @PostConstruct)
 
-== link:{resourcedir}/dependencies/annotation-based/annotation-based.xml[Konfig Metadata]
-
+== @Autowired
+=== Ein einfaches Beispiel
+==== link:{resourcedir}/dependencies/annotation-based/annotation-based.xml[Konfig Metadata]
 
 [source,xml]
 ----
@@ -28,10 +49,12 @@ Folgende Annotationen werden wir in diesem Abschnit beleuchten:
       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config/>
     <!-- bean definitions go here -->
+    <bean id="springBeanExplorer" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBeanExplorer"/>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBean"/>
 </beans>
 ----
 
-== link:{sourcedir}/ch/wesr/spring/core/container/annotation/based/SpringBean.java[SpringBean]
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/SpringBean.java[SpringBean]
 
 [source,java]
 ----
@@ -54,6 +77,32 @@ public class SpringBean {
 
     public void setKlasse(String klasse) {
         this.klasse = klasse;
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/SpringBeanExplorer.java[SpringBeanExplorer]
+Die @Autowired Annotation steht in folgendem Beispiel auf dem Attribut. Sie könnte aber ebenso gut auf der Setter Methode sein. Persönlich bin ich an die Attribute Annnotation aus den SpringBoot Projekten gewöhnt.
+[source, java]
+----
+public class SpringBeanExplorer {
+
+    @Autowired
+    private SpringBean springBean;
+
+    public void explore() {
+        springBean.setKlasse(springBean.getClass().getSimpleName());
+        springBean.setObjectName("springBean");
+        springBean.sayHello();
+    }
+
+    public SpringBean getSpringBean() {
+        return springBean;
+    }
+
+    // @Autowired
+    public void setSpringBean(SpringBean springBean) {
+        this.springBean = springBean;
     }
 }
 ----
