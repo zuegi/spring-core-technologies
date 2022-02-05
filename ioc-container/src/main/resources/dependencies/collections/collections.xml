@@ -1,49 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd">
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="springBean1" name="customBean, dedicatedBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.collections.SpringBean1"/>
-    <bean id="springBean2" name="customBean1, dedicatedBean1" class="ch.wesr.spring.core.container.xml.dependencyinjection.collections.SpringBean2"/>
+    <bean id="springBean1" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.SpringBean1"/>
+    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.SpringBean2"/>
 
-    <bean id="komplexeBean" class="ch.wesr.spring.core.container.xml.dependencyinjection.collections.KomplexeBean">
-        <property name="emails">
-            <props>
-                <prop key="chef">chef@firlefanz.org</prop>
-                <prop key="sous-chef">sour.chef@firlefanz.org</prop>
-                <prop key="sous-sous-chef">sous.sous.chef@firlefanz.org</prop>
-            </props>
-        </property>
+    <util:properties id="emails" value-type="java.lang.String" local-override="true">
+        <prop key="chef">chef@firlefanz.org</prop>
+        <prop key="sous-chef">sous.chef@firlefanz.org</prop>
+        <prop key="sous-sous-chef">sous.sous.chef@firlefanz.org</prop>
+    </util:properties>
 
-        <property name="kundenListe">
-            <list>
-                <value>Paperlapapp AG</value>
-                <value>Gibt es gar nicht Gmbh</value>
-                <value>Enterprise AG</value>
-            </list>
-        </property>
 
-        <property name="beanListe">
-            <list>
-                <ref bean="springBean1"/>
-                <ref bean="springBean2"/>
-            </list>
-        </property>
+    <util:list id="beanListe" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <ref bean="springBean2"/>
+        <ref bean="springBean1"/>
+    </util:list>
 
-        <property name="beanMap">
-            <map>
-                <entry key="springBean1" value-ref="springBean1"/>
-                <entry key="springBean2" value-ref="springBean2"/>
-            </map>
-        </property>
+    <util:map id="beanMap" map-class="java.util.HashMap" key-type="java.lang.String" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <entry key="springBean1" value-ref="springBean1"/>
+        <entry key="springBean2" value-ref="springBean2"/>
+    </util:map>
 
-        <property name="beanSet">
-            <set>
-                <ref bean="springBean1" />
-                <ref bean="springBean2" />
-            </set>
-        </property>
+    <util:set id="beanSet" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <ref bean="springBean1"/>
+        <ref bean="springBean2"/>
+    </util:set>
+
+    <bean id="collectionBean" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.CollectionBean">
+        <property name="emails" ref="emails" />
+        <property name="beanMap" ref="beanMap"/>
+        <property name="beanListe" ref="beanListe"/>
+        <property name="beanSet" ref="beanSet"/>
     </bean>
 
 

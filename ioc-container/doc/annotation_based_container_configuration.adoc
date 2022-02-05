@@ -2,29 +2,41 @@
 :sourcedir: ../src/main/java
 :resourcedir: ../src/main/resources
 :docudir: ..
-:toc: left
+:toc:
 
 In der annotation-based Konfiguration von Spring Framework, gibt es die Möglichkeit eine Bean-Konfiguration in eine Komponentenklasse zu verschieben, anstatt XML für die Beschreibung der Bean-Verdrahtung zu verwenden. Dies geschieht durch die Verwendung von Annotationen für die entsprechende Klasse, Methode oder Felddeklaration.
 Die Annotation Injection geschieht bevor der XML Injection. Somit überschreibt die XML Injection die Annotations-Eigenschaften.
 
 == Das <context:annotation-config/> Element in der XML Konfiguration
-Wie immer könnte man sich die PostProcesser Beans als individuelle Beans definieren (
 
-!!!!!! TODO:siehe Beispiel lslsl
+Mit dem *<context:annotation-config/>* XML Element und dem dem *context* Namespace
 
-).
-Es geht aber auch über das XLML Element *<context:annotation-config/>* und dem *context* Namespace
-http://www.springframework.org/schema/context
-https://www.springframework.org/schema/context/spring-context.xsd
+* http://www.springframework.org/schema/context
+* https://www.springframework.org/schema/context/spring-context.xsd
 
-Mit der <context:annotation-config/> werden implizit folgende PostProcesserBeans registriert
+werden implizit folgende PostProcesserBeans registriert
 
 * ConfigurationClassPostProcessor
+* RequiredAnnotationBeanPostProcessor (deprecated)
 * AutowiredAnnotationBeanPostProcessor
 * CommonAnnotationBeanPostProcessor
 * PersistenceAnnotationBeanPostProcessor
 * EventListenerMethodProcessor
 
+
+=== PostProcessors als eigenständige Beans definieren.
+Wie immer kann man sich die PostProcesser Beans als individuelle Beans definieren
+link:{resourcedir}/dependencies/annotation-based/autowired-annotation-bean-post-processor.xml[AutowiredAnnotationBeanPostProcessor Konfiguration Metadata]
+
+[source, xml]
+----
+<!-- der PostProcessor für die Autowrire Injection -->
+<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+<!-- weitere bean definitions ab hier -->
+----
+Sieh das ganze Beispiel hier link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/AutowiredAnnotationBeanPostProcessorRunner.java[AutowiredAnnotationBeanPostProcessorRunner]
+
+== Annotationen
 
 Folgende Annotationen werde ich in diesem Abschnit beleuchten:
 
@@ -32,6 +44,11 @@ Folgende Annotationen werde ich in diesem Abschnit beleuchten:
 * @Autowired
 * @Qualifier
 * JSR-250 Annotations (@Resource, @PreDestroy und @PostConstruct)
+
+== @Required (deprecated)
+`Die @Required-Annotation und der RequiredAnnotationBeanPostProcessor sind ab Spring Framework 5.1 formal deprecated, zugunsten der Verwendung von Konstruktorinjektion`
+
+Daher keine weiteren Ausführungen zu diesem Thema an dieser Stelle.
 
 == @Autowired
 === Ein einfaches Beispiel
@@ -49,12 +66,12 @@ Folgende Annotationen werde ich in diesem Abschnit beleuchten:
       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
     <context:annotation-config/>
     <!-- bean definitions go here -->
-    <bean id="springBeanExplorer" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBeanExplorer"/>
-    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.SpringBean"/>
+    <bean id="springBeanExplorer" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.SpringBeanExplorer"/>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.SpringBean"/>
 </beans>
 ----
 
-==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/SpringBean.java[SpringBean]
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/SpringBean.java[SpringBean]
 
 [source,java]
 ----
@@ -81,7 +98,7 @@ public class SpringBean {
 }
 ----
 
-==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/SpringBeanExplorer.java[SpringBeanExplorer]
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/SpringBeanExplorer.java[SpringBeanExplorer]
 Die @Autowired Annotation steht in folgendem Beispiel auf dem Attribut. Sie könnte aber ebenso gut auf der Setter Methode sein. Persönlich bin ich an die Attribute Annnotation aus den SpringBoot Projekten gewöhnt.
 [source, java]
 ----
@@ -106,9 +123,24 @@ public class SpringBeanExplorer {
     }
 }
 ----
+Ab Spring Framework 4.3 ist eine @Autowired-Annotation auf einem Konstruktor nicht mehr notwendig oder zunächst nur einen Konstruktor definiert. Wenn jedoch mehrere Konstruktoren verfügbar sind und es keinen primären/default Konstruktor gibt, muss mindestens einer der Konstruktoren mit @Autowired annotiert werden, um dem Container mitzuteilen, welcher zu verwenden ist. Siehe die Diskussion über link:{docudir}/doc/dependencies/di/constructor_argument_resolution.md[Constructor Argument Resolution] für Details.
+
+=== Ein @Autowired mit Collections Beispiel
+In diesem Beispiel geht es darum, dass man auch Set, Map und Properties vom Typ Collections als Beans definieren und injectedn kann.
+Siehe auch das Beispiel link:{docudir}/doc/dependencies/configurations/collections.md[Collection Based Autowiring]
+
+TODO Beschreibung mit dem *util* Namespace
+
+==== link:{resourcedir}/dependencies/collections/collections.xml[Collections Configuration XML]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/collections/CollectionBean.java[CollectionBean.java]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/collections/CollectionBeanRunner.java[CollectionBeanRunner.java]
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
 * https://www.tutorialspoint.com/spring/spring_annotation_based_configuration.htm[Tutorialspoint - Spring Annotation Based Configuration]
+* https://www.netjstech.com/2016/04/autowiring-using-annotations-in-spring-autowired-inject-qualifier.html[netjstech.com - Autowiring in Spring]
+* https://medium.com/@codebyamir/create-list-and-map-beans-in-spring-xml-48dce335de23[@codebyamir - Create List and Map Beans in Spring XML]
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]

@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.xml.annotationbased;
+package ch.wesr.spring.core.container.xml.annotationbased.autowired;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
