@@ -126,16 +126,175 @@ public class SpringBeanExplorer {
 Ab Spring Framework 4.3 ist eine @Autowired-Annotation auf einem Konstruktor nicht mehr notwendig oder zunächst nur einen Konstruktor definiert. Wenn jedoch mehrere Konstruktoren verfügbar sind und es keinen primären/default Konstruktor gibt, muss mindestens einer der Konstruktoren mit @Autowired annotiert werden, um dem Container mitzuteilen, welcher zu verwenden ist. Siehe die Diskussion über link:{docudir}/doc/dependencies/di/constructor_argument_resolution.md[Constructor Argument Resolution] für Details.
 
 === Ein @Autowired mit Collections Beispiel
-In diesem Beispiel geht es darum, dass man auch Set, Map und Properties vom Typ Collections als Beans definieren und injectedn kann.
+In diesem Beispiel geht es darum, dass man auch Set, Map und Properties vom Typ Collections als Beans definieren und "injecten" kann.
 Siehe auch das Beispiel link:{docudir}/doc/dependencies/configurations/collections.md[Collection Based Autowiring]
 
-TODO Beschreibung mit dem *util* Namespace
+Damit man die Collections Elemente auch als Beans definieren kann, verwendet man z.B. den Namespace *util*.
 
 ==== link:{resourcedir}/dependencies/collections/collections.xml[Collections Configuration XML]
 
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="springBean1" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.SpringBean1"/>
+    <bean id="springBean2" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.SpringBean2"/>
+
+    <util:properties id="emails" value-type="java.lang.String" local-override="true">
+        <prop key="chef">chef@firlefanz.org</prop>
+        <prop key="sous-chef">sous.chef@firlefanz.org</prop>
+        <prop key="sous-sous-chef">sous.sous.chef@firlefanz.org</prop>
+    </util:properties>
+
+
+    <util:list id="beanListe" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <ref bean="springBean2"/>
+        <ref bean="springBean1"/>
+    </util:list>
+
+    <util:map id="beanMap" map-class="java.util.HashMap" key-type="java.lang.String" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <entry key="springBean1" value-ref="springBean1"/>
+        <entry key="springBean2" value-ref="springBean2"/>
+    </util:map>
+
+    <util:set id="beanSet" value-type="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.MeineBean">
+        <ref bean="springBean1"/>
+        <ref bean="springBean2"/>
+    </util:set>
+
+    <bean id="collectionBean" class="ch.wesr.spring.core.container.xml.annotationbased.autowired.collections.CollectionBean">
+        <property name="emails" ref="emails" />
+        <property name="beanMap" ref="beanMap"/>
+        <property name="beanListe" ref="beanListe"/>
+        <property name="beanSet" ref="beanSet"/>
+    </bean>
+
+
+</beans>
+----
+
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/collections/CollectionBean.java[CollectionBean.java]
 
+[source, java]
+----
+ @Autowired
+    private Properties emails;
+    @Autowired
+    private List<MeineBean> beanListe;
+    @Autowired
+    private HashMap<String, MeineBean> beanMap;
+    @Autowired
+    private Set<MeineBean> beanSet;
+
+    @Autowired
+    private SpringBean1 springBean1;
+
+    @Autowired
+    SpringBean2 springBean2;
+
+    public void sayHello() {
+        System.out.println("Emails");
+        System.out.println("\tchef:           "+emails.get("chef"));
+        System.out.println("\tsous-chef:      "+emails.get("sous-chef"));
+        System.out.println("\tsous-sous-chef: "+emails.get("sous-sous-chef"));
+
+        System.out.println("\n");
+        System.out.println("Beanliste welche die Referenzen auf die SpringBeans* hält");
+        beanListe.forEach(MeineBean::sayHello);
+        System.out.println("\n");
+        System.out.println("BeanMap:");
+        springBean1 = (SpringBean1) beanMap.get("springBean1");
+        springBean1.sayHello();
+        springBean2 = (SpringBean2) beanMap.get("springBean2");
+        springBean2.sayHello();
+
+        System.out.println("\n");
+        System.out.println("BeanSet: ");
+        beanSet.forEach(MeineBean::sayHello);
+    }
+    // getter und setter
+----
+
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/collections/CollectionBeanRunner.java[CollectionBeanRunner.java]
+
+[source, java]
+----
+ public static void main(String[] args) {
+        ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("dependencies/collections/collections.xml");
+        CollectionBean collectionBean = (CollectionBean) context.getBean("collectionBean");
+
+        collectionBean.sayHello();
+    }
+----
+
+==== output
+[source,text]
+----
+Emails
+    chef:           chef@firlefanz.org
+    sous-chef:      sous.chef@firlefanz.org
+    sous-sous-chef: sous.sous.chef@firlefanz.org
+
+
+Beanliste welche die Referenzen auf die SpringBeans* hält
+Hello from SpringBean2
+Hello from SpringBean1
+
+
+BeanMap:
+Hello from SpringBean1
+Hello from SpringBean2
+
+
+BeanSet:
+Hello from SpringBean1
+Hello from SpringBean2
+----
+
+=== Autowiring mit @Primary
+
+Autowiring über den Typ kann zu mehreren Bean Injection Kandidaten führen. Deshalb ist es manchme notwendig, mehr Kontrolle über den Auswahlprozess zu haben. Eine Möglichkeit, dies zu erreichen, ist die @Primary-Annotation von Spring. @Primary zeigt an, dass eine bestimmte Bean bevorzugt werden soll, wenn mehrere Beans Kandidaten sind, die in einer einwertigen Abhängigkeit autowired werden sollen. Wenn es unter den Kandidaten genau eine primäre Bean gibt, wird diese zum autowired-Wert.
+
+
+==== Annotation based
+
+TODO Doku fertig stellen
+
+====== link:{resourcedir}/dependencies/autowire/annotation-primary-autowired.xml[Annotation Primary XML Config]
+
+====== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/primary/SpringBean.java[SpringBean.java]
+
+====== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/primary/PrimaryAnnotationRunner.java[PrimaryAnnotationRunner.java]
+
+
+====== output
+[source, text]
+----
+Hello primary from SpringBean
+----
+
+===== Die xml Variante
+
+====== link:{resourcedir}/dependencies/autowire/primary-autowired.xml[Autowired primary="true" xml config]
+
+
+====== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/primary/SpringBean.java[SpringBean.java]
+
+====== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/primary/PrimaryAutowireBeanRunner.java[PrimaryAutowireBeanRunner.java]
+
+====== output
+[source, text]
+----
+Hello primary from SpringBean
+----
+
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
