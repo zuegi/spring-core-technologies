@@ -1,13 +1,14 @@
-package ch.wesr.spring.core.container.xml.annotationbased.autowired.primary;
+package ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier;
 
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-public class SpringBeanConfig {
+public class SpringBeanQualifierConfig {
 
-    @Primary
+
     @Bean
+    @Qualifier("primary")
     public SpringBean primaryBean() {
         SpringBean springBean = new SpringBean();
         springBean.setName("primary");
@@ -15,6 +16,7 @@ public class SpringBeanConfig {
     }
 
     @Bean
+    @Qualifier("secondary")
     public SpringBean secondaryBean() {
         SpringBean springBean = new SpringBean();
         springBean.setName("secondary");
