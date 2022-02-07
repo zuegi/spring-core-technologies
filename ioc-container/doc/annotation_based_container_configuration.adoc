@@ -3,6 +3,7 @@
 :resourcedir: ../src/main/resources
 :docudir: ..
 :toc:
+:sectnumlevels: 4
 
 In der annotation-based Konfiguration von Spring Framework, gibt es die Möglichkeit eine Bean-Konfiguration in eine Komponentenklasse zu verschieben, anstatt XML für die Beschreibung der Bean-Verdrahtung zu verwenden. Dies geschieht durch die Verwendung von Annotationen für die entsprechende Klasse, Methode oder Felddeklaration.
 Die Annotation Injection geschieht bevor der XML Injection. Somit überschreibt die XML Injection die Annotations-Eigenschaften.
@@ -567,6 +568,149 @@ public static void main(String[] args) {
     springBeanExplorer.explore();
 }
 ----
+
+=== Wichtig
+Bei einer Fallback-Übereinstimmung wird der Bean-Name als Standard-Qualifier-Wert betrachtet. So können Sie die Bean mit einer id von main anstelle des verschachtelten Qualifier-Elements definieren, was zu demselben Ergebnis führt. Obwohl Sie diese Konvention verwenden können, um auf bestimmte Beans über ihren Namen zu verweisen, geht es bei @Autowired grundsätzlich um typgesteuerte Injektion mit optionalen semantischen Qualifiern. Das bedeutet, dass Qualifier-Werte, selbst mit dem Bean-Namen-Fallback, immer eine einschränkende Semantik innerhalb der Menge der Typübereinstimmungen haben. Sie drücken nicht semantisch einen Verweis auf eine eindeutige Bean-ID aus. Gute Qualifier-Werte sind main oder EMEA oder persistent und drücken Eigenschaften einer bestimmten Komponente aus, die unabhängig von der Bean-ID sind, die im Falle einer anonymen Bean-Definition wie der im vorangegangenen Beispiel automatisch generiert werden kann.
+
+Wenn man beabsichtigt, die annotationsgesteuerte Injektion nach Namen auszudrücken, sollte man nicht in erster Linie @Autowired verwenden, auch wenn es in der Lage ist, unter den Kandidaten für die Typübereinstimmung nach dem Bean-Namen auszuwählen. Verwende stattdessen die JSR-250-Annotation @Resource, die semantisch so definiert ist, dass sie eine bestimmte Zielkomponente anhand ihres eindeutigen Namens identifiziert, wobei der deklarierte Typ für den Anpassungsprozess irrelevant ist.
+
+@Autowired gilt für Felder, Konstruktoren und Methoden mit mehreren Argumenten und ermöglicht eine Eingrenzung durch Qualifier-Annotationen auf der Parameterebene. Im Gegensatz dazu wird @Resource nur für Felder und Bean Property Setter-Methoden mit einem einzigen Argument unterstützt.
+
+=== Erstelle Custom Qualifier Annotations
+Einen CustomQualifier über eine Annotation zu erstellen, ist gar nicht so schwierig.
+
+Erstelle dazu eine Annotation wie folgt.
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/CustomQualifier.java[Interface CustomQualifier.java]
+
+[source,java]
+----
+@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier
+public @interface CustomQualifier {
+    String value();
+}
+----
+
+===== link:{resourcedir}/dependencies/autowire/custom-qualifier-autowired.xml[custom-qualifier-autowired.xml]
+
+Erweitere die xml Konfiguration um die das Attribut *type* im Element <qualifier/>
+[source,xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          https://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config/>
+
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.SpringBean">
+        <qualifier type="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.CustomQualifier" value="primary"/>
+        <property name="name" value="primaryBean"/>
+    </bean>
+
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.SpringBean">
+        <qualifier type="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.CustomQualifier" value="secondary"/>
+        <property name="name" value="secondaryBean"/>
+    </bean>
+
+    <bean id="springBeanExplorer"
+          class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.SpringBeanExplorer">
+    </bean>
+
+</beans>
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/SpringBeanExplorer.java[SpringBeanExplorer]
+
+Die SpringBeanExplorer Klasse wird dann über die *@CustomQualifier* Annotation konfiguriert.
+
+[source,java]
+----
+public class SpringBeanExplorer {
+
+    @Autowired
+    @CustomQualifier("secondary")
+    private SpringBean springBean;
+
+    public void explore() {
+        springBean.sayHello();
+    }
+
+}
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/SpringBean.java[SpringBean]
+
+Die SpringBean bekommt von alldem gar nichts mit und ist wie so oft eine sehr einfache Klasse.
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/CustomQualifierRunner.java[CustomQualifierRunner.java]
+
+Die main() Methode lädt die entsprechende link:{resourcedir}/dependencies/autowire/custom-qualifier-autowired.xml[custom-qualifier-autowired.xml]
+
+[source,java]
+----
+ public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/autowire/custom-qualifier-autowired.xml");
+    SpringBeanExplorer bean = context.getBean(SpringBeanExplorer.class);
+    bean.explore();
+}
+----
+
+==== output
+[source,text]
+----
+Hello secondaryBean from SpringBean+
+----
+
+In manchen Fällen reicht sogar ein Qualifier ohne Wert, dann sieht das ganze folgendermassen aus.
+
+===== link:{resourcedir}/dependencies/autowire/custom-no-value-qualifier-autowired.xml[custom-no-value-qualifier-autowired.xml]
+
+Beachte, dass das Element <qualifier/> nur mit dem Attribut *type* ohne Wert angegeben wird.
+
+---
+ <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.SpringBean">
+    <qualifier type="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.custom.CustomQualifier"/>
+    <property name="name" value="secondaryBean"/>
+</bean>
+---
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/SpringBeanSecondaryExplorer.java[SpringBeanSecondaryExplorer.java]
+
+----
+public class SpringBeanSecondaryExplorer {
+
+    @Autowired
+   @SecondaryQualifier
+    private SpringBean springBean;
+
+    public void explore() {
+        springBean.sayHello();
+    }
+
+}
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/custom/CustomNoValueQualifierRunner.java[CustomNoValueQualifierRunner.java]
+
+----
+public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/autowire/custom-no-value-qualifier-autowired.xml");
+    SpringBeanExplorer bean = context.getBean(SpringBeanExplorer.class);
+    bean.explore();
+}
+
+----
+
+
+=== Using Generics für Autowiring Qualifiers
+
+!!!! TODO !!!!!
+
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
