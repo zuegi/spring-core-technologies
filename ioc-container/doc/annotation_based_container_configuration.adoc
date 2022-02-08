@@ -766,6 +766,23 @@ public interface GenericsQualifier<T>{
 }
 ----
 
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/SpringBean1.java[SpringBean1] und link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/SpringBean2.java[SpringBean2]
+
+Der Trick besteht jetzt darin, dass die beiden Beans das Interface über ein Generics Typ definieren.
+Exemplarisch die SpringBean1 den Typ String, die SpringBean2 den Typ Integer und damit sind beide Beans implizit qualifiziert.
+[source,java]
+----
+public class SpringBean1 implements GenericsQualifier<String> {
+    //...
+}
+----
+[source,java]
+----
+public class SpringBean2 implements GenericsQualifier<Integer> {
+    //...
+}
+----
+
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/GenericsQualifierRunner.java[GenericsQualifierRunner.java]
 
 Der Runner ist schnell erzählt
