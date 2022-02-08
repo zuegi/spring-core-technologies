@@ -709,8 +709,82 @@ public static void main(String[] args) {
 
 === Using Generics für Autowiring Qualifiers
 
-!!!! TODO !!!!!
+Es ist auch möglich Java Generics als eine implizite Form für eine Qualifizierung einer Bean zu verwenden.
 
+==== link:{resourcedir}/dependencies/autowire/generic-qualifier.xml[generic-qualifier.xml]
+
+Nehmen wir eine einfache Bean Definition XML Konfiguration.
+[source, xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          https://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:annotation-config/>
+
+
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.generics.SpringBeanExplorer"/>
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.generics.SpringBean1">
+        <property name="name" value="René"/>
+    </bean>
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.generics.SpringBean2">
+        <property name="zahl" value="69"/>
+    </bean>
+</beans>
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/SpringBeanExplorer.java[SpringBeanExplorer.java]
+
+Die SpringBeanExplorer Klasse injected dabei nicht direkt die im XML definierten SpringBean1 und SpringBean2, sondern das Interface GenericsQualifier<T>
+[source,java]
+----
+public class SpringBeanExplorer {
+
+    @Autowired
+    private GenericsQualifier<String> springbeanString;
+
+    @Autowired
+    private GenericsQualifier<Integer> springBeanInteger;
+
+    public void explore() {
+        springbeanString.sayHello();
+        springBeanInteger.sayHello();
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/GenericsQualifier.java[GenericsQualifier.java]
+
+Das Interface selber ist einfach gehalten mit einem generischen Typ T.
+[source,java]
+----
+public interface GenericsQualifier<T>{
+    void sayHello();
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/generics/GenericsQualifierRunner.java[GenericsQualifierRunner.java]
+
+Der Runner ist schnell erzählt
+[source,java]
+----
+public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/autowire/generic-qualifier.xml");
+    SpringBeanExplorer bean = context.getBean(SpringBeanExplorer.class);
+    bean.explore();
+}
+----
+
+==== output
+
+[source,text]
+----
+Hello René fromSpringBean1
+Hello with zahl: 69
+----
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
