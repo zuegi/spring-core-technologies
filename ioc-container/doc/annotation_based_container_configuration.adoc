@@ -422,6 +422,10 @@ Hello primary from SpringBean
 === Fine-tuning Annotation-based Autowiring mit @Qualifier
 Wenn man mehr Kontrolle über den Selektionsprozess über die Bean Injection haben muss, kann man Qualifier-Werte mit bestimmten Argumenten verknüpfen und so die Menge derselben Typen einschränken.
 
+Es gibt 3 Arten wie man eine Dependency Injection qualifiziert und damit eindeutig macht.
+* @Qualifier
+* Custom Qualifier (verwendet aber ebenfalls die @Qualifier Annotation)
+* CustomAutowireConfigurer
 
 ==== Annotation based
 
@@ -569,7 +573,7 @@ public static void main(String[] args) {
 }
 ----
 
-=== Wichtig
+*Wichtig*
 Bei einer Fallback-Übereinstimmung wird der Bean-Name als Standard-Qualifier-Wert betrachtet. So können Sie die Bean mit einer id von main anstelle des verschachtelten Qualifier-Elements definieren, was zu demselben Ergebnis führt. Obwohl Sie diese Konvention verwenden können, um auf bestimmte Beans über ihren Namen zu verweisen, geht es bei @Autowired grundsätzlich um typgesteuerte Injektion mit optionalen semantischen Qualifiern. Das bedeutet, dass Qualifier-Werte, selbst mit dem Bean-Namen-Fallback, immer eine einschränkende Semantik innerhalb der Menge der Typübereinstimmungen haben. Sie drücken nicht semantisch einen Verweis auf eine eindeutige Bean-ID aus. Gute Qualifier-Werte sind main oder EMEA oder persistent und drücken Eigenschaften einer bestimmten Komponente aus, die unabhängig von der Bean-ID sind, die im Falle einer anonymen Bean-Definition wie der im vorangegangenen Beispiel automatisch generiert werden kann.
 
 Wenn man beabsichtigt, die annotationsgesteuerte Injektion nach Namen auszudrücken, sollte man nicht in erster Linie @Autowired verwenden, auch wenn es in der Lage ist, unter den Kandidaten für die Typübereinstimmung nach dem Bean-Namen auszuwählen. Verwende stattdessen die JSR-250-Annotation @Resource, die semantisch so definiert ist, dass sie eine bestimmte Zielkomponente anhand ihres eindeutigen Namens identifiziert, wobei der deklarierte Typ für den Anpassungsprozess irrelevant ist.
@@ -803,11 +807,169 @@ Hello René fromSpringBean1
 Hello with zahl: 69
 ----
 
+=== CustomAutowireConfigurer (BeanFactoryPostProcessor)
+Der CustomAutowireConfigurer ist die Implementierung von BeanFactoryPostProcessor. Der CustomAutowireConfigurer wird verwendet, um benutzerdefinierte Qualifier zu erstellen. Der Qualifier wird verwendet, um Konflikte bei der Dependency Injection aufzulösen, wenn mehr als eine Bean für das Autowiring in Frage kommt.
+Dabei wird die @Qualifier Annotation nicht vewendet, sondern die Qualifier über die Bean Definition in der XML Konfiguration erstellt.
+
+Zunächste einmal erstellen wir 2 Qualifier ohne jegliche Methoden.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/IntegerQualifier.java[IntegerQualifier.java]
+
+[source,java]
+----
+@Target({ElementType.FIELD, ElementType.METHOD,
+        ElementType.TYPE, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface IntegerQualifier {
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/StringQualifier.java[StringQualifier.java]
+[source,java]
+----
+@Target({ElementType.FIELD, ElementType.METHOD,
+        ElementType.TYPE, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface StringQualifier {
+
+}
+----
+
+==== link:{resourcedir}/dependencies/autowire/custom-autowire-configurer.xml[custom-autowire-configurer.xml]
+
+In der XML Konfiguration werden die beiden String- und IntegerQualifier über die CustomAutowireConfigurer Bean registriert, sowie unsere SpringBeanInteger, SpringBeanString und die SpringExplorerBean
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <context:annotation-config/>
+
+    <bean id="customAutowireConfigurer" class="org.springframework.beans.factory.annotation.CustomAutowireConfigurer">
+        <property name="customQualifierTypes">
+            <set>
+                <value>ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.StringQualifier</value>
+                <value>ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.IntegerQualifier</value>
+            </set>
+        </property>
+    </bean>
+
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.SpringBeanString">
+        <property name="name" value="springBeanString"/>
+        <qualifier type="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.StringQualifier"/>
+    </bean>
+
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.SpringBeanInteger">
+        <property name="zahl" value="69"/>
+        <qualifier type="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.IntegerQualifier"/>
+    </bean>
+
+    <bean id="springBeanExplorer"
+          class="ch.wesr.spring.core.container.xml.annotationbased.autowired.qualifier.postprocessor.SpringBeanExplorer">
+    </bean>
+
+</beans>
+----
+
+Die Beans werden wie folgt erstellt
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/SpringBean.java[SpringBean.java]
+
+Zunächst das SpringBean Interface.
+[source,java]
+----
+public interface SpringBean {
+
+    void sayHello();
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/SpringBeanInteger.java[SpringBeanInteger.java]
+
+[source,java]
+----
+public class SpringBeanInteger implements SpringBean {
+    private Integer zahl;
+
+    @Override
+    public void sayHello() {
+        System.out.println("Hello with zahl: " +zahl);
+    }
+
+    public Integer getZahl() {
+        return zahl;
+    }
+
+    public void setZahl(Integer zahl) {
+        this.zahl = zahl;
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/SpringBeanString.java[SpringBeanString.java]
+[source,java]
+----
+public class SpringBeanString implements  SpringBean{
+    private String name;
+
+    @Override
+    public void sayHello() {
+        System.out.println("Hello " +name +" from" +this.getClass().getSimpleName());
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/autowired/qualifier/postprocessor/SpringBeanExplorer.java[SpringBeanExplorer.java]
+Die SpringBeanExplorer Bean injected beide SpringBean* Objekte, qualifiziert über die entsprechende Annotation.
+[source,java]
+----
+public class SpringBeanExplorer {
+
+    @Autowired
+    @StringQualifier
+    private SpringBean springBean;
+
+    @Autowired
+    @IntegerQualifier
+    private SpringBean intBean;
+
+
+    public void explore() {
+        springBean.sayHello();
+        intBean.sayHello();
+    }
+}
+----
+
+==== output
+[source,text]
+----
+Hello springBeanString fromSpringBeanString
+Hello with zahl: 69
+----
+
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
 * https://www.tutorialspoint.com/spring/spring_annotation_based_configuration.htm[Tutorialspoint - Spring Annotation Based Configuration]
 * https://www.netjstech.com/2016/04/autowiring-using-annotations-in-spring-autowired-inject-qualifier.html[netjstech.com - Autowiring in Spring]
 * https://medium.com/@codebyamir/create-list-and-map-beans-in-spring-xml-48dce335de23[@codebyamir - Create List and Map Beans in Spring XML]
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/inject-bean-by-name.html[logicbig inject-bean-by-name]
+* https://www.concretepage.com/spring/example_customautowireconfigurer_spring[concretepage.com - AutowireConfigurer]
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
