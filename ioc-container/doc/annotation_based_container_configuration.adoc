@@ -964,6 +964,53 @@ Hello springBeanString fromSpringBeanString
 Hello with zahl: 69
 ----
 
+=== Injection with @Resources
+
+Spring supportet die Annotation @Resoures über die JSF-250 @Resource Annotation, und zwar auf Attributen und Setter Methoden der Beans.
+Dabei verwendet @Resources ein Namens-Attribute, welches durch Spring als Wert für den Namen der zu injectenden Bean interpretiert wird. Wenn kein Name explizit angegeben wird, wird der Standardname aus dem Feldnamen oder der Setter-Methode abgeleitet. Im Falle eines Feldes wird der Feldname verwendet. Im Falle einer Setter-Methode wird der Name der Bean-Eigenschaft verwendet.
+Im exklusiven Fall der Verwendung von @Resource ohne explizite Namensangabe und ähnlich wie @Autowired findet @Resource eine primäre Typübereinstimmung anstelle einer bestimmten benannten Bean und löst bekannte auflösbare Abhängigkeiten auf: die Interfaces BeanFactory, ApplicationContext, ResourceLoader, ApplicationEventPublisher und MessageSource.
+
+
+!!!!!! TODO !!!!! fertig dokumentieren
+inklusive dem Beispiel ohne XML!!!!
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
+
+==== link:{resourcedir}/dependencies/annotation-based/resources-annotation.xml[resources-annotation.xml]
+
+[source,xml]
+----
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          https://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+
+    <bean id="springBeanExplorer" class="ch.wesr.spring.core.container.xml.annotationbased.resources.SpringBeanExplorer"/>
+    <bean name="allerweltsBean" class="ch.wesr.spring.core.container.xml.annotationbased.resources.SpringBean">
+        <property name="name" value="René"/>
+    </bean>
+    <bean class="ch.wesr.spring.core.container.xml.annotationbased.resources.SpringBean2">
+        <property name="name" value="Paul"/>
+    </bean>
+
+</beans>
+----
+
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBean.java[SpringBean.java]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBean2.java[SpringBean2.java]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBeanExplorer.java[SpringBeanExplorer.java]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
+
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
 * https://www.tutorialspoint.com/spring/spring_annotation_based_configuration.htm[Tutorialspoint - Spring Annotation Based Configuration]
@@ -971,5 +1018,6 @@ Hello with zahl: 69
 * https://medium.com/@codebyamir/create-list-and-map-beans-in-spring-xml-48dce335de23[@codebyamir - Create List and Map Beans in Spring XML]
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/inject-bean-by-name.html[logicbig inject-bean-by-name]
 * https://www.concretepage.com/spring/example_customautowireconfigurer_spring[concretepage.com - AutowireConfigurer]
+* https://nurkiewicz.com/2011/01/spring-framework-without-xml-at-all.html[nurkiewicz.com - spring framework withouzt xml at all]
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
