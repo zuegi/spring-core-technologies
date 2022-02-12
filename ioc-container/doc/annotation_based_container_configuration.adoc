@@ -971,12 +971,11 @@ Dabei verwendet @Resources ein Namens-Attribute, welches durch Spring als Wert f
 Im exklusiven Fall der Verwendung von @Resource ohne explizite Namensangabe und ähnlich wie @Autowired findet @Resource eine primäre Typübereinstimmung anstelle einer bestimmten benannten Bean und löst bekannte auflösbare Abhängigkeiten auf: die Interfaces BeanFactory, ApplicationContext, ResourceLoader, ApplicationEventPublisher und MessageSource.
 
 
-!!!!!! TODO !!!!! fertig dokumentieren
-inklusive dem Beispiel ohne XML!!!!
-
 link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
 
 ==== link:{resourcedir}/dependencies/annotation-based/resources-annotation.xml[resources-annotation.xml]
+
+In der Bean Definition Konfiguration werden die Beans definiert. Dabei wird der SpringBean definition das Attribut *name="allerweltsBean"* gesetzt.
 
 [source,xml]
 ----
@@ -1005,11 +1004,134 @@ link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ResourcesInj
 
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBean.java[SpringBean.java]
 
+[source,java]
+----
+public class SpringBean {
+
+    private String name;
+
+    public void sayHello() {
+        System.out.println("Hello " +name +" from " +this.getClass().getSimpleName());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+----
+
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBean2.java[SpringBean2.java]
 
+[source,java]
+----
+public class SpringBean2 {
+
+    private String name;
+
+
+    public void sayHello() {
+        System.out.println("Hello " +name +" from " +this.getClass().getSimpleName());
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+----
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/SpringBeanExplorer.java[SpringBeanExplorer.java]
 
+Die SpringBeanExplorer Bean injected die beiden Beans SpringBean und SpringBean2, sowie den ApplicationContext.
+Die SpringBean wird über *@Resource(name = "allerweltsBean")* aufgelöst und injected.
+
+Im exklusiven Fall der Verwendung von @Resource ohne explizite Namensangabe und ähnlich wie @Autowired findet @Resource eine primäre Typübereinstimmung anstelle einer bestimmten benannten Bean und löst bekannte auflösbare Abhängigkeiten auf: die Interfaces BeanFactory, ApplicationContext, ResourceLoader, ApplicationEventPublisher und MessageSource.
+
+Bei der SpringBean2 wird zuerst versucht über den Namen aufzulösen und weil keiner gesetzt wird der Fallback über den Typ (SpringBean2) aufgelöst und injected.
+
+Im ApplicationContext wird direkt über den primären Type die Auflösung und Injection gemacht.
+
+[source,java]
+----
+public class SpringBeanExplorer {
+
+    @Resource(name = "allerweltsBean")
+    private SpringBean bean;
+
+    @Resource
+    private SpringBean2 halloBean;
+
+    @Resource
+    ApplicationContext context;
+
+    public void explore() {
+        context.getBeanDefinitionNames();
+        for (String beanDefinitionName : context.getBeanDefinitionNames()) {
+            System.out.println("bean defintion name: " +beanDefinitionName);
+        }
+        bean.sayHello();
+        halloBean.sayHello();
+    }
+}
+----
+
 ==== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
+
+[source,java]
+----
+ public static void main(String[] args) {
+    ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/annotation-based/resources-annotation.xml");
+    SpringBeanExplorer springBeanExplorer = (SpringBeanExplorer) context.getBean("springBeanExplorer");
+    springBeanExplorer.explore();
+}
+----
+
+Im Source zu finden ist dasselbe Beispiel ohne XML Konfiguration zu finden.
+Der grosse Unterschied ist hier, wie der Runner gestartet, bzw. der ApplicationContext initalisiert wirde.
+Der ApplicationContext wird über die  *AnnotationConfigApplicationContext* Bean eine *ApplicationConfig.class* Klasse übergeben.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
+[source,java]
+----
+public static void main(String[] args) {
+    ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+    SpringBeanExplorer springBeanExplorer = (SpringBeanExplorer) context.getBean("springBeanExplorer");
+    springBeanExplorer.explore();
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ApplicationConfig.java[ApplicationConfig.java]
+[source,java]
+----
+@Configuration
+public class ApplicationConfig {
+
+    @Bean(name = "allerweltsBean")
+    public SpringBean springBean() {
+        return new SpringBean("René");
+    }
+
+    @Bean
+    public SpringBean2 irgendeineBean() {
+        return new SpringBean2("Paul");
+    }
+
+    @Bean
+    public SpringBeanExplorer springBeanExplorer() {
+        return new SpringBeanExplorer();
+    }
+}
+----
+
+=== Verwende @Value
+
+!!!!! TODO !!!!!!
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
