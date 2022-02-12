@@ -964,14 +964,11 @@ Hello springBeanString fromSpringBeanString
 Hello with zahl: 69
 ----
 
-=== Injection with @Resources
+=== Injection with @Resources XML Version
 
 Spring supportet die Annotation @Resoures über die JSF-250 @Resource Annotation, und zwar auf Attributen und Setter Methoden der Beans.
 Dabei verwendet @Resources ein Namens-Attribute, welches durch Spring als Wert für den Namen der zu injectenden Bean interpretiert wird. Wenn kein Name explizit angegeben wird, wird der Standardname aus dem Feldnamen oder der Setter-Methode abgeleitet. Im Falle eines Feldes wird der Feldname verwendet. Im Falle einer Setter-Methode wird der Name der Bean-Eigenschaft verwendet.
 Im exklusiven Fall der Verwendung von @Resource ohne explizite Namensangabe und ähnlich wie @Autowired findet @Resource eine primäre Typübereinstimmung anstelle einer bestimmten benannten Bean und löst bekannte auflösbare Abhängigkeiten auf: die Interfaces BeanFactory, ApplicationContext, ResourceLoader, ApplicationEventPublisher und MessageSource.
-
-
-link:{sourcedir}/ch/wesr/spring/core/container/annotation/resources/ResourcesInjectionRunner.java[ResourcesInjectionRunner.java]
 
 ==== link:{resourcedir}/dependencies/annotation-based/resources-annotation.xml[resources-annotation.xml]
 
@@ -1092,6 +1089,8 @@ public class SpringBeanExplorer {
 }
 ----
 
+
+=== Injection with @Resources Java Annotation
 Im Source zu finden ist dasselbe Beispiel ohne XML Konfiguration zu finden.
 Der grosse Unterschied ist hier, wie der Runner gestartet, bzw. der ApplicationContext initalisiert wirde.
 Der ApplicationContext wird über die  *AnnotationConfigApplicationContext* Bean eine *ApplicationConfig.class* Klasse übergeben.
