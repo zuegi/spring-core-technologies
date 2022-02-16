@@ -650,5 +650,6 @@ Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen 
 
 ## [Annotation based Container Configuration](doc/annotation_based_container_configuration.adoc)
 
+## 1.10 [Classpath Scanning und Managed Components](doc/classpath_scanning_and_managed_components.adoc)
 ## to be completed
 

@@ -1,0 +1,6 @@
+= Classpath Scanning und Managed Components
+
+
+link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
+
+
