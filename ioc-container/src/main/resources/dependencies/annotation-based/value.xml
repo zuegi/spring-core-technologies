@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="mappings" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="classpath:props/application.properties"/>
+        <!-- Es gibt auch die Möglichkeit von mehreren Properties Files in einer Liste mitzugeben. -->
+<!--        <property name="locations">-->
+<!--            <list>-->
+<!--                <value>classpath:props/application.properties</value>-->
+<!--            </list>-->
+<!--        </property>-->
+    </bean>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.value.SpringBean">
+        <constructor-arg value="${app.author.firstname}"/>
+        <property name="name" value="${app.author.name}"/>
+        <property name="myProp" value="#{systemEnvironment['my-prop']}"/>
+        <property name="myOption" value="#{systemProperties['my-option']}"/>
+        <property name="hobbies" value="#{'${app.author.hobbies}'.split(',')}"/>
+        <property name="anotherProp" value="#{systemProperties['another-propt'] ?: 'kein anderes Property gesetzt'}"/>
+    </bean>
+
+</beans>

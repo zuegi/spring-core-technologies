@@ -1129,8 +1129,229 @@ public class ApplicationConfig {
 ----
 
 === Verwende @Value
+@Value wird typischerweise verwendet um externe Konfigurationen in die Applikation zu injecten.
+Spring Boot konfiguriert standardmäßig eine PropertySourcesPlaceholderConfigurer-Bean, die Eigenschaften aus den Dateien *application.properties* und *application.yml* bezieht.
 
-!!!!! TODO !!!!!!
+
+Wenn Sie einen PropertySourcesPlaceholderConfigurer mit JavaConfig konfigurieren, muss die @Bean-Methode statisch sein.
+
+Die Verwendung der obigen Konfiguration stellt sicher, dass die Initialisierung von Spring fehlschlägt, wenn ein ${}-Platzhalter nicht aufgelöst werden konnte. Es ist auch möglich, Methoden wie setPlaceholderPrefix, setPlaceholderSuffix oder setValueSeparator zu verwenden, um die Platzhalter anzupassen.
+
+
+Die integrierte Konverterunterstützung von Spring ermöglicht die automatische Durchführung einfacher Typkonvertierungen (z. B. in Integer oder int). Mehrere kommagetrennte Werte können ohne zusätzlichen Aufwand automatisch in ein String-Array konvertiert werden.
+
+Ein Spring BeanPostProcessor verwendet hinter den Kulissen einen ConversionService, um den Prozess der Konvertierung des String-Wertes in @Value in den Zieltyp zu steuern. Wenn Sie Konvertierungsunterstützung für Ihren eigenen benutzerdefinierten Typ anbieten möchten, können Sie Ihre eigene ConversionService-Bean-Instanz bereitstellen, wie das folgende Beispiel zeigt:
+
+==== Annotation based
+
+Zunächst einmal brauchen wir ein properties files
+
+===== link:{resourcedir}/props/application.properties[application.properties]
+
+[source, properties]
+----
+app.author.name=Satellite
+app.author.firstname=George
+app.author.hobbies=reading,relaxing,swimming
+valuesMap={key1: 'New York', key2: 'Tokio', key3: 'Rom'}
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/annotation/value/ApplicationConfig.java[ApplicationConfig.java]
+
+In der ApplicationConfig wird die PropertySourcesPlaceholderConfigurer Bean konfiguriert. In *SpringBoot* wird diese Bean *by default* konfiguriert, aber wir müssen dies wie folgt machen.
+
+[source,java]
+----
+@Configuration
+@ComponentScan
+@PropertySource("classpath:props/application.properties")
+public class ApplicationConfig {
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+}
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/annotation/value/SpringBean.java[SpringBean.java]
+
+Die SpringBean beinhaltet einige Beispiele, was mit @Value alles injected werden kann.
+Siehe auch https://www.baeldung.com/spring-value-annotation für weitere Erkklärungen.
+
+Beispiele wie _@Value("#{systemProperties['my-option']}")_ gehören zur Kategorie Spring Expression Language (SpEL) und kennzeichnen sich mit dem führenden #.
+
+[source,java]
+----
+@Component
+public class SpringBean {
+
+    @Value("${app.author.name}")
+    private String name;
+
+    @Value("${app.author.name}")
+    private final String firstName;
+
+
+    @Value("#{'${app.author.hobbies}'.split(',')}")
+    private String[] hobbies;
+
+    @Value("#{systemEnvironment['my-prop']}")
+    private String myProp;
+
+    @Value("#{systemProperties['my-option']}")
+    private String myOption;
+
+    @Value("#{systemProperties['another-propt'] ?: 'kein anderes Property gesetzt'}")
+    private String anotherProp;
+
+    @Value("#{${valuesMap}}")
+    private Map<String, String> valuesMap;
+
+    @Value("#{${valuesMap}.?[value.equals('Tokio')]}")
+    private Map<String, String> valuesMapFiltered;
+
+    public SpringBean(@Value("${app.author.firstname}")String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void sayHello() {
+        System.out.println("Hello " +firstName +" " +name + " from " +this.getClass().getSimpleName());
+        System.out.println("Deine Hobbies sind:" + Arrays.toString(hobbies));
+        System.out.println("\tenvironment var my-prop: " + myProp);
+        System.out.println("\tsytemproperty my-option: " + myOption);
+        System.out.println("\tsytemproperty another-prop: " + anotherProp);
+        System.out.println(Arrays.asList(valuesMap));
+        System.out.println(Arrays.asList(valuesMapFiltered));
+    }
+}
+----
+
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/annotation/value/AtValueRunner.java[AtValueRunner.java]
+[source,java]
+----
+public class AtValueRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+        SpringBean springBean = (SpringBean) context.getBean("springBean");
+        springBean.sayHello();
+    }
+}
+----
+
+==== output
+[source, text]
+----
+Hello Satellite Satellite from SpringBean
+Deine Hobbies sind:[reading, relaxing, swimming]
+	environment var my-prop: null
+	sytemproperty my-option: null
+	sytemproperty another-prop: kein anderes Property gesetzt
+[{key1=New York, key2=Tokio, key3=Rom}]
+[{key2=Tokio}]
+----
+
+==== XML basiert
+
+===== link:{resourcedir}/props/application.properties[application.properties]
+
+[source, properties]
+----
+app.author.name=Satellite
+app.author.firstname=George
+app.author.hobbies=reading,relaxing,swimming
+valuesMap={key1: 'New York', key2: 'Tokio', key3: 'Rom'}
+----
+
+===== link:{resourcedir}/dependencies/annotation-based/value.xml[value.xml]
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="mappings" class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="location" value="classpath:props/application.properties"/>
+        <!-- Es gibt auch die Möglichkeit von mehreren Properties Files in einer Liste mitzugeben. -->
+<!--        <property name="locations">-->
+<!--            <list>-->
+<!--                <value>classpath:props/application.properties</value>-->
+<!--            </list>-->
+<!--        </property>-->
+    </bean>
+    <bean id="springBean" class="ch.wesr.spring.core.container.xml.annotationbased.value.SpringBean">
+        <constructor-arg value="${app.author.firstname}"/>
+        <property name="name" value="${app.author.name}"/>
+        <property name="myProp" value="#{systemEnvironment['my-prop']}"/>
+        <property name="myOption" value="#{systemProperties['my-option']}"/>
+        <property name="hobbies" value="#{'${app.author.hobbies}'.split(',')}"/>
+        <property name="anotherProp" value="#{systemProperties['another-propt'] ?: 'kein anderes Property gesetzt'}"/>
+    </bean>
+
+</beans>
+
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/SpringBean.java[SpringBean.java]
+[source,java]
+----
+public class SpringBean {
+
+    private String name;
+    private String firstName;
+    private String[] hobbies;
+    private String myProp;
+    private String myOption;
+    private String anotherProp;
+
+    public SpringBean(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void sayHello() {
+        System.out.println("Hello " +firstName +" " +name + " from " +this.getClass().getSimpleName());
+        System.out.println("Deine Hobbies sind:" +Arrays.toString(hobbies));
+        System.out.println("\tenvironment var my-prop: " + myProp);
+        System.out.println("\tsytemproperty my-option: " + myOption);
+        System.out.println("\tsytemproperty another-prop: " + anotherProp);
+
+    }
+    // getter und setter
+}
+----
+
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/AtValueRunner.java[AtValueRunner.java]
+[source,java]
+----
+public class AtValueRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/annotation-based/value.xml");
+        SpringBean bean = (SpringBean) context.getBean("springBean");
+        bean.sayHello();
+    }
+}
+----
+
+Damit das oben beschriebene XML Konfig Beispiel läuft, braucht es -D Parameter und eine Environment Variable.
+
+image::RuntimeConfigAtValueRunner.png[RuntimeConfig in Intellij]
+
+
+==== output
+[source, text]
+----
+Hello George Satellite from SpringBean
+Deine Hobbies sind:[reading, relaxing, swimming]
+	environment var my-prop: schnullifax
+	sytemproperty my-option: trallala
+	sytemproperty another-prop: kein anderes Property gesetzt
+----
 
 == Referenzen
 * https://data-flair.training/blogs/spring-annotation/[data flair - spring-annotation]
@@ -1140,5 +1361,6 @@ public class ApplicationConfig {
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/inject-bean-by-name.html[logicbig inject-bean-by-name]
 * https://www.concretepage.com/spring/example_customautowireconfigurer_spring[concretepage.com - AutowireConfigurer]
 * https://nurkiewicz.com/2011/01/spring-framework-without-xml-at-all.html[nurkiewicz.com - spring framework withouzt xml at all]
+* https://www.baeldung.com/spring-value-annotation
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
