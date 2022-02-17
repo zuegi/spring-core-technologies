@@ -1325,7 +1325,7 @@ public class SpringBean {
 }
 ----
 
-===== AtValueRunner.java
+===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/AtValueRunner.java[AtValueRunner.java]
 [source,java]
 ----
 include::{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/AtValueRunner.java[]
