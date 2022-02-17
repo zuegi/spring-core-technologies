@@ -1325,17 +1325,10 @@ public class SpringBean {
 }
 ----
 
-===== link:{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/AtValueRunner.java[AtValueRunner.java]
+===== AtValueRunner.java
 [source,java]
 ----
-public class AtValueRunner {
-
-    public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("dependencies/annotation-based/value.xml");
-        SpringBean bean = (SpringBean) context.getBean("springBean");
-        bean.sayHello();
-    }
-}
+include::{sourcedir}/ch/wesr/spring/core/container/xml/annotationbased/value/AtValueRunner.java[]
 ----
 
 Damit das oben beschriebene XML Konfig Beispiel läuft, braucht es -D Parameter und eine Environment Variable.

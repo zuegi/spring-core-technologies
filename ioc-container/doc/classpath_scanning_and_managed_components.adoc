@@ -1,5 +1,35 @@
 = Classpath Scanning und Managed Components
 
+== 1.10.1 @Component und andere Steretyp Annotationen
+Spring stellt Stereotyp Annotationen wie @Component, @Service, @Controller @Repository und weitere zur Verfügung.
+Dabei ist @Component ein generischer Stereotyp für alle Spring-managed Components. So sind @Repository, @Service und @Controller eine Spezialisierung von @Component.
+Hier sehr schön am Beispiel des @Repository Interface aus dem Package *org.springframework.stereotype;*
+[source, java]
+----
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Repository {
+    @AliasFor(
+        annotation = Component.class
+    )
+    String value() default "";
+}
+----
+
+Das heisst jede Klasse kann mit @Component annotiert werden. *Doch wenn man die Wahl zwischen @Component und z.B. @Service für eine Service Klasse hat, dann ist die @Service Annotation vorzuziehen*. Diese und auch die anderen von @Conmponent abgeleiteten Annotationen werden in Zukunft noch viel mehr in die Semantik von Spring einbezogen.
+So unterstützt zum Beispiel die @Repository Annotation als Marker bereits die Exception Translation im Persistence Layer.
+
+Mehr zu diesem Thema in Kapitel https://docs.spring.io/spring-framework/docs/5.3.14/reference/html/data-access.html#orm-exception-translation[Exception Translation].
+
+== 1.10.2 Meta-Annotations und Composed Annotations
+
+=== Was sind Meta-Annotationen?
+Meta-Annotationen sind Annotationen, welche in anderen Annotationen anwendbar sind. @Component ist eine Meta-Annotation, welche in der @Repository Annotation anwendbar/verwendet ist. @Repository ist *meta-annotated* mit @Component.
+
+=== Was sind Composed Annotations?
+
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
 
