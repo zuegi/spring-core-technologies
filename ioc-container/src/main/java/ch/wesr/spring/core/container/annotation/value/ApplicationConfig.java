@@ -8,7 +8,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = {"ch.wesr.spring.core.container.annotation.value"})
 @PropertySource("classpath:props/application.properties")
 public class ApplicationConfig {
 

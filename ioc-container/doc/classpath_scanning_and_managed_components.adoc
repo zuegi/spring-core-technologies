@@ -1,4 +1,6 @@
 = Classpath Scanning und Managed Components
+:toc:
+:sectnumlevels: 4
 
 == 1.10.1 @Component und andere Steretyp Annotationen
 Spring stellt Stereotyp Annotationen wie @Component, @Service, @Controller @Repository und weitere zur Verfügung.
@@ -29,6 +31,101 @@ Mehr zu diesem Thema in Kapitel https://docs.spring.io/spring-framework/docs/5.3
 Meta-Annotationen sind Annotationen, welche in anderen Annotationen anwendbar sind. @Component ist eine Meta-Annotation, welche in der @Repository Annotation anwendbar/verwendet ist. @Repository ist *meta-annotated* mit @Component.
 
 === Was sind Composed Annotations?
+
+Unter Composed Annotations versteht man Annotationen, welche Attribute aus Meta-Annotationen neu deklarieren, um nur eine Teilmenge der möglichen Attribute aus der Meta-Annotation offen zu legen.
+So wird in untenstehendem Beispiel eine SessionScope Annotation erstellt, welche den Scope hardcodiert auf *Session* festlegt, jedoch den die Anpassung des ScopedProxyMode erlaubt.
+
+[source, java]
+----
+   @Target({ElementType.TYPE, ElementType.METHOD})
+  @Retention(RetentionPolicy.RUNTIME)
+  @Documented
+  @Scope(WebApplicationContext.SCOPE_SESSION)
+  public @interface SessionScope {
+      /**
+       * Alias for {@link Scope#proxyMode}.
+       * <p>Defaults to {@link ScopedProxyMode#TARGET_CLASS}.
+       */
+      @AliasFor(annotation = Scope.class)
+      ScopedProxyMode proxyMode() default ScopedProxyMode.TARGET_CLASS;
+}
+----
+
+@SessionScope mit proxyMode
+[source, java]
+----
+@Service
+@SessionScope(proxyMode = ScopedProxyMode.INTERFACES)
+public class SessionScopdeService {
+    //...
+}
+----
+@SessionScope ohne proxyMode
+[source, java]
+----
+@Service
+@SessionScope
+public class SessionScopdeService {
+    //...
+}
+----
+
+== 1.10.3 Automatisches Erkennen von Klassen und Registrierung von Bean Definitions
+
+Damit Spring automatisch Klassen entdecken und die zugehörigen Beans registrieren kann, braucht es eine Annotation *@ComponentScan*  mit der Angabe des *basePackage* in einer Spring Konfiguration.
+
+=== Java Annotation @ComponentScan
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = "ch.wesr.spring.core.container")
+public class ApplicationConfig {
+    // ...
+}
+----
+Falls man mehrere verschiedene basePackages scannen will, kann man auch eine Komma-separierte Liste angeben.
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = {"ch.wesr.spring.core.container", "ch.wesr.utils"})
+public class ApplicationConfig {
+    // ...
+}
+----
+
+alternativ kann man auch *basePackages* weglassen
+[source,java]
+----
+@Configuration
+@ComponentScan({"ch.wesr.spring.core.container", "ch.wesr.utils"; "ch.wesr.text" "ch.wesr.monitor"})
+public class ApplicationConfig {
+    // ...
+}
+----
+
+=== XML Konfiguration für component-scann
+
+Die Verwendung von *<context:component-scan>* aktiviert implizit die Funktionalität von *<context:annotation-config>*. Normalerweise ist es nicht notwendig, das <context:annotation-config>-Element einzuschließen, wenn <context:component-scan> verwendet wird.
+
+[source, xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+  <beans xmlns="http://www.springframework.org/schema/beans"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:context="http://www.springframework.org/schema/context"
+      xsi:schemaLocation="http://www.springframework.org/schema/beans
+          https://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          https://www.springframework.org/schema/context/spring-context.xsd">
+      <context:component-scan base-package="org.example"/>
+  </beans>
+----
+
+[CAUTION]
+Auf dem Modulpfad von JDK 9 (Jigsaw) funktioniert das Scannen des Spring-Klassenpfads im Allgemeinen wie erwartet. Stellen Sie jedoch sicher, dass Ihre Komponentenklassen in Ihren Modul-Informationsdeskriptoren exportiert werden. Wenn Sie erwarten, dass Spring nicht-öffentliche Mitglieder Ihrer Klassen aufruft, stellen Sie sicher, dass diese "geöffnet" sind (d. h. dass sie eine opens-Deklaration anstelle einer exports-Deklaration in Ihrem Modul-Info-Deskriptor verwenden)
+
+=== 1.10.4. Using Filters to Customize Scanning
 
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
