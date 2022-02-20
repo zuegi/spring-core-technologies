@@ -1,4 +1,7 @@
 = Classpath Scanning und Managed Components
+:sourcedir: ../src/main/java
+:resourcedir: ../src/main/resources
+:docudir: ..
 :toc:
 :sectnumlevels: 4
 
@@ -74,6 +77,8 @@ public class SessionScopdeService {
 
 Damit Spring automatisch Klassen entdecken und die zugehörigen Beans registrieren kann, braucht es eine Annotation *@ComponentScan*  mit der Angabe des *basePackage* in einer Spring Konfiguration.
 
+Eine richtig gute Dokumentation zu diesem Thema findet man hier: https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
+
 === Java Annotation @ComponentScan
 
 [source,java]
@@ -104,6 +109,16 @@ public class ApplicationConfig {
 }
 ----
 
+==== Verwende ein type-safe Attribut *usePackageClasses* in der @ComponentScan Annotation
+
+@ComponentScan#basePackageClasses ist eine type-safe Art um ein Package für den ComponentScan zu definieren.
+Dabei erstellt man ein Interface (Empfehlung von Spring), welches im zu scannenden Package liegt.
+
+
+!!!!!! TODO !!!!!!!!!!!!!
+Beispiel an dieser Stell
+
+
 === XML Konfiguration für component-scann
 
 Die Verwendung von *<context:component-scan>* aktiviert implizit die Funktionalität von *<context:annotation-config>*. Normalerweise ist es nicht notwendig, das <context:annotation-config>-Element einzuschließen, wenn <context:component-scan> verwendet wird.
@@ -125,8 +140,107 @@ Die Verwendung von *<context:component-scan>* aktiviert implizit die Funktionali
 [CAUTION]
 Auf dem Modulpfad von JDK 9 (Jigsaw) funktioniert das Scannen des Spring-Klassenpfads im Allgemeinen wie erwartet. Stellen Sie jedoch sicher, dass Ihre Komponentenklassen in Ihren Modul-Informationsdeskriptoren exportiert werden. Wenn Sie erwarten, dass Spring nicht-öffentliche Mitglieder Ihrer Klassen aufruft, stellen Sie sicher, dass diese "geöffnet" sind (d. h. dass sie eine opens-Deklaration anstelle einer exports-Deklaration in Ihrem Modul-Info-Deskriptor verwenden)
 
-=== 1.10.4. Using Filters to Customize Scanning
+== 1.10.4. Using Filters to Customize Scanning
 
+Standardmäßig sind Klassen, die mit
+
+* @Component,
+* @Repository,
+* @Service,
+* @Controller,
+* @Configuration
+* oder einer benutzerdefinierten Annotation, die selbst mit @Component annotiert ist,
+
+die einzigen erkannten Kandidatenkomponenten.
+Das kann man aber ändern, indem man einen benutzerdefinierten Filter verwendet. Diese Filter werden der *@ComponentScan* als Attribute mitgegeben. Jedes Filter Element erfordert ein *type* und ein *expression* Attribut
+
+Dazu ein Beispiel:
+
+=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/SayHelloBean.java[SayHelloBean.java]
+eine einfache Klasse, ohne Spring Abhängigkeit.
+
+[source, java]
+----
+public class SayHelloBean {
+
+    public void hello() {
+        System.out.println("Hello, Ich bin das SayHelloBean");
+    }
+}
+----
+
+Welche  in einer mit einer @Componenten annotierten SpringBean Klasse verwendet wird
+
+=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/SpringBean.java[SpringBean.java]
+----
+@Component
+public class SpringBean {
+
+    @Autowired
+    SayHelloBean sayHelloBean;
+
+    public void sayHello() {
+        sayHelloBean.hello();
+    }
+}
+----
+Solange die SayHelloBean nicht gescannt wird und damit dem Spring Container bekannt ist, wird eine NoSuchBeanDefinitionException geworfen.
+[source, text]
+----
+org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'ch.wesr.spring.core.container.annotation.customscan.SayHelloBean' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+----
+Damit diese Exception nicht geworfen wird, muss man dem Spring Container beibringen die SayHelloBean zu scannen, und das macht man über die Konfiguration.
+
+=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/AppConfig.java[AppConfig.java]
+In der AppConfig Klasse wird nicht nur das SpringBean deklariert, sondern eben auch die @ComponentScann Annotation mit einem benutzerdefinierten Filer ergänzt.
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = "ch.wesr.spring.core.container.annotation.customscan",
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SayHelloBean.class})
+)
+public class AppConfig {
+
+    @Bean
+    SpringBean springBean() {
+        return new SpringBean();
+    }
+
+}
+----
+
+Mit diesen Filtern könnte man noch weitere Beispiele machen, an dieser Stelle seien die möglichen Filtertypen (aus dem Enum FilterType) erwähnt.
+[sourc, java]
+----
+package org.springframework.context.annotation;
+
+public enum FilterType {
+    ANNOTATION,
+    ASSIGNABLE_TYPE,
+    ASPECTJ,
+    REGEX,
+    CUSTOM;
+
+    private FilterType() {
+    }
+}
+----
+
+!!!!TODO!!!!!!
+
+.Table FilterTypes
+|===
+|ColumnFilter Type| Example Expression | Description
+|ANNOTATION | org.example.SomeAnnotation |
+|ASSIGNABLE_TYPE | |
+|ASPECTJ | |
+|REGEX | |
+|CUSTOM | |
+|===
+
+== Referenzen
+* https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
 
