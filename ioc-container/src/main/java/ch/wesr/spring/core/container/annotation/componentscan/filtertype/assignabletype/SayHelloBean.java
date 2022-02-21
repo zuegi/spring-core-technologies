@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.annotation.customscan;
+package ch.wesr.spring.core.container.annotation.componentscan.filtertype.assignabletype;
 
 public class SayHelloBean {
 

@@ -3,7 +3,7 @@
 :resourcedir: ../src/main/resources
 :docudir: ..
 :toc:
-:sectnumlevels: 4
+:sectnumlevels: 5
 
 == 1.10.1 @Component und andere Steretyp Annotationen
 Spring stellt Stereotyp Annotationen wie @Component, @Service, @Controller @Repository und weitere zur Verfügung.
@@ -109,15 +109,68 @@ public class ApplicationConfig {
 }
 ----
 
-==== Verwende ein type-safe Attribut *usePackageClasses* in der @ComponentScan Annotation
+=== Verwende ein type-safe Attribut *usePackageClasses* in der @ComponentScan Annotation
 
 @ComponentScan#basePackageClasses ist eine type-safe Art um ein Package für den ComponentScan zu definieren.
 Dabei erstellt man ein Interface (Empfehlung von Spring), welches im zu scannenden Package liegt.
 
+In unserem Beispiel haben wir unter dem Package/Verzeichnis src/main/java/ch/wesr/spring/core/container/annotation/basepackageclass
+2 verschiedene Packages
 
-!!!!!! TODO !!!!!!!!!!!!!
-Beispiel an dieser Stell
+* client
+* service
 
+in beiden Packages gibt es nun ein einfaches Interface - ein sogennantes Marker-Interface, und zwar das
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/basepackageclass/client/ClientMarkerInterface.java[ClientMarkerInterface]
+
+[source, java]
+----
+public interface ClientMarkerInterface {
+}
+----
+und das
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/basepackageclass/service/ServiceMarkerInterface.java[ServiceMarkerInterface]
+
+[source, java]
+----
+public interface ServiceMarkerInterface {
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/basepackageclass/config/AppConfig.java[AppConfig.java]
+
+Diese beiden Interfaces werden dann in der AppConfig.java über das Attribut *basePackageClasses* angegeben, welche Spring veranlasst in den Packages, wo sich diese Marker-Interfaces befinden nach weiteren Bean Definitionen zu scannen.
+
+[source, java]
+----
+@Configuration
+@ComponentScan(basePackageClasses = {ClientMarkerInterface.class, ServiceMarkerInterface.class})
+public class AppConfig {
+}
+----
+
+Die beiden Bean Definitionen *ClientBean* und *ServiceBean* sind dann mit den Spring Annotation @Component bzw. @Service gekennzeichnet.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/basepackageclass/client/ClientBean.java[ClientBean.java]
+
+[source, java]
+----
+@Component
+public class ClientBean {
+    public void sayHello() {
+        System.out.println("Hello from " +this.getClass().getSimpleName());
+    }
+}
+----
+
+===== output
+[source, text]
+----
+Hello from ClientBean
+Hello from ServiceBean
+----
 
 === XML Konfiguration für component-scann
 
@@ -154,61 +207,7 @@ Standardmäßig sind Klassen, die mit
 die einzigen erkannten Kandidatenkomponenten.
 Das kann man aber ändern, indem man einen benutzerdefinierten Filter verwendet. Diese Filter werden der *@ComponentScan* als Attribute mitgegeben. Jedes Filter Element erfordert ein *type* und ein *expression* Attribut
 
-Dazu ein Beispiel:
-
-=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/SayHelloBean.java[SayHelloBean.java]
-eine einfache Klasse, ohne Spring Abhängigkeit.
-
-[source, java]
-----
-public class SayHelloBean {
-
-    public void hello() {
-        System.out.println("Hello, Ich bin das SayHelloBean");
-    }
-}
-----
-
-Welche  in einer mit einer @Componenten annotierten SpringBean Klasse verwendet wird
-
-=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/SpringBean.java[SpringBean.java]
-----
-@Component
-public class SpringBean {
-
-    @Autowired
-    SayHelloBean sayHelloBean;
-
-    public void sayHello() {
-        sayHelloBean.hello();
-    }
-}
-----
-Solange die SayHelloBean nicht gescannt wird und damit dem Spring Container bekannt ist, wird eine NoSuchBeanDefinitionException geworfen.
-[source, text]
-----
-org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'ch.wesr.spring.core.container.annotation.customscan.SayHelloBean' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
-----
-Damit diese Exception nicht geworfen wird, muss man dem Spring Container beibringen die SayHelloBean zu scannen, und das macht man über die Konfiguration.
-
-=== link:{sourcedir}/ch/wesr/spring/core/container/annotation/customscan/AppConfig.java[AppConfig.java]
-In der AppConfig Klasse wird nicht nur das SpringBean deklariert, sondern eben auch die @ComponentScann Annotation mit einem benutzerdefinierten Filer ergänzt.
-
-[source,java]
-----
-@Configuration
-@ComponentScan(basePackages = "ch.wesr.spring.core.container.annotation.customscan",
-    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SayHelloBean.class})
-)
-public class AppConfig {
-
-    @Bean
-    SpringBean springBean() {
-        return new SpringBean();
-    }
-
-}
-----
+=== Folgende FilterTypen gibt es
 
 Mit diesen Filtern könnte man noch weitere Beispiele machen, an dieser Stelle seien die möglichen Filtertypen (aus dem Enum FilterType) erwähnt.
 [sourc, java]
@@ -227,17 +226,158 @@ public enum FilterType {
 }
 ----
 
-!!!!TODO!!!!!!
 
 .Table FilterTypes
 |===
-|ColumnFilter Type| Example Expression | Description
-|ANNOTATION | org.example.SomeAnnotation |
-|ASSIGNABLE_TYPE | |
+|ColumnFilter Type| Beispiel | Beschreibung
+|ANNOTATION | link:#ANNOTATION[SayHelloBean.java] | Eine benutzerdefinierte Annotation
+|ASSIGNABLE_TYPE | link:#ASSIGNABLE_TYPE[BenutzerDefinierterScan.java] |
 |ASPECTJ | |
 |REGEX | |
 |CUSTOM | |
 |===
+
+=== [[ANNOTATION]]FilterType ANNOTATION
+
+Über die MarkerInterfaces wird Spring mitgeteilt, in welchen Pfade die gewünschten Bean Defintions zu finden sind. Weil sie so einfach sind, sind sie an dieser Stelle nur verlinkt.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/explore/ExplorerMarkerInterface.java[ExplorerMarkerInterface.java]
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/service/ServiceMarkerInterface.java[ServiceMarkerInterface.java]
+
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/config/AppConfig.java[AppConfig.java]
+
+Spannender ist die AppConfig, da hier nicht nur die MarkerInterfaces definiert sind, sondern eben auch eine benuzterdefinierte Annotation -> BenutzerdefinierterScan
+[source,java]
+----
+@Configuration
+@ComponentScan(
+        basePackageClasses = {ExplorerMarkerInterface.class, ServiceMarkerInterface.class},
+        includeFilters = @ComponentScan.Filter(
+                type = FilterType.ANNOTATION,
+                classes = {BenutzerDefinierterScan.class})
+)
+public class AppConfig {
+}
+----
+
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/BenutzerDefinierterScan.java[BenutzerDefinierterScan.java]
+Die BenutzerDefinierterScan Annotation wird wie folgt erstellt.
+
+[source,java]
+----
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface BenutzerDefinierterScan {
+    String value() default "";
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/service/ServiceBean.java[ServiceBean.java]
+
+[source,java]
+----
+@BenutzerDefinierterScan
+public class ServiceBean {
+    public void sayHello() {
+        System.out.println("Hello from " +this.getClass().getSimpleName());
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/annotation/AnnotationFilterTypeRunner.java[AnnotationFilterTypeRunner.java]
+Der Beweis wird wie immer über den Runner Aufruf gewährleistet.
+
+[source,java]
+----
+public class AnnotationFilterTypeRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        BeanExplorer bean = context.getBean(BeanExplorer.class);
+        bean.explore();
+    }
+}
+----
+
+==== output
+[source,text]
+----
+Hello from ServiceBean
+----
+
+=== [[ASSIGNABLE_TYPE]]FilterType ASSIGNABLE_TYPE
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/assignabletype/SayHelloBean.java[SayHelloBean.java]
+eine einfache Klasse, ohne Spring Abhängigkeit.
+
+[source, java]
+----
+public class SayHelloBean {
+
+    public void hello() {
+        System.out.println("Hello, Ich bin das SayHelloBean");
+    }
+}
+----
+
+Welche  in einer mit einer @Component annotierten SpringBean Klasse verwendet wird
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/assignabletype/SpringBean.java[SpringBean.java]
+----
+@Component
+public class SpringBean {
+
+    @Autowired
+    SayHelloBean sayHelloBean;
+
+    public void sayHello() {
+        sayHelloBean.hello();
+    }
+}
+----
+Solange die SayHelloBean nicht gescannt wird und damit dem Spring Container bekannt ist, wird eine NoSuchBeanDefinitionException geworfen.
+[source, text]
+----
+org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'ch.wesr.spring.core.container.annotation.componentscan.customscan.SayHelloBean' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+----
+Damit diese Exception nicht geworfen wird, muss man dem Spring Container beibringen die SayHelloBean zu scannen, und das macht man über die Konfiguration.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/assignabletype/AppConfig.java[AppConfig.java]
+In der AppConfig Klasse wird nicht nur das SpringBean deklariert, sondern eben auch die @ComponentScann Annotation mit einem benutzerdefinierten Filer ergänzt.
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = "ch.wesr.spring.core.container.annotation.componentscan.customscan",
+    includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {SayHelloBean.class})
+)
+public class AppConfig {
+
+    @Bean
+    SpringBean springBean() {
+        return new SpringBean();
+    }
+
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/assignabletype/CustomComponentScan.java[CustomComponentScan]
+
+[source,java]
+----
+public class CustomComponentScan {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        SpringBean bean = context.getBean(SpringBean.class);
+        bean.sayHello();
+    }
+}
+----
+
 
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html

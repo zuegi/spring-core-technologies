@@ -1,4 +1,4 @@
-package ch.wesr.spring.core.container.annotation.customscan;
+package ch.wesr.spring.core.container.annotation.componentscan.filtertype.assignabletype;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
