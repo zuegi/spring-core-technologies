@@ -232,9 +232,9 @@ public enum FilterType {
 |ColumnFilter Type| Beispiel | Beschreibung
 |ANNOTATION | link:#ANNOTATION[SayHelloBean.java] | Eine benutzerdefinierte Annotation
 |ASSIGNABLE_TYPE | link:#ASSIGNABLE_TYPE[BenutzerDefinierterScan.java] | Eine spezifische Klasse oder Interface, welche gesucht und zugewiesen wird.
-|ASPECTJ | link:#REGEX[FiltertypeRegexjRunner.java.java] | Eine Regex
-|REGEX |  link:#ASPECTJ[FiltertypeAspectjRunner.java] |
-|CUSTOM | link:#CUSTOM[BenutzerDefinierterScan.java] |
+|ASPECTJ | link:#REGEX[FiltertypeRegexjRunner.java.java] | Eine Regex basierte Implementierung
+|REGEX |  link:#ASPECTJ[FiltertypeAspectjRunner.java] | Eine Aspectj basierte Implementierung
+|CUSTOM | link:#CUSTOM[ComponentScanCustomFilter.java] | Eine Benutzerdefinierte Implementierung der TypeFilter.
 |===
 
 === [[ANNOTATION]]FilterType ANNOTATION
@@ -462,21 +462,58 @@ public class FiltertypeAspectjRunner {
 
 === [[CUSTOM]]FilterType CUSTOM
 
-==== link:{sourcedir}[]
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/custom/config/AppConfig.java[AppConfig.java]
+Neben dem basePackageClasses CustomMarkerInterface wird in der AppConfig.java Klasse wird auf eine ComponentScanCustomFilter.class verwiesen.
 
 [source, java]
 ----
-
+@Configuration
+@ComponentScan(basePackageClasses = {CustomMarkerInterface.class},
+        includeFilters = @ComponentScan.Filter(type = FilterType.CUSTOM,
+                classes = ComponentScanCustomFilter.class)
+)
+public class AppConfig {
+}
 ----
 
 
-==== link:{sourcedir}[]
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/custom/config/ComponentScanCustomFilter.java[ComponentScanCustomFilter.java]
+
+Im ComponentScanCustomFilter wird der Klassenname extrahiert und wie in den vorherigen Beispielen auf die entsprechenden BeanNamen geprüft.
 
 [source, java]
 ----
-
+public class ComponentScanCustomFilter implements TypeFilter {
+    @Override
+    public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
+        ClassMetadata classMetadata = metadataReader.getClassMetadata();
+        String fullyQualifiedName = classMetadata.getClassName();
+        String className = fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf(".") + 1);
+        return className.contains("gBean") && !className.contains("Bean2");
+    }
+}
 ----
 
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/custom/CustomFiltertypeRunner.java[CustomFiltertypeRunner.java]
+
+Der CustomFiltertypeRunner ist unspektakulär.
+[source,java]
+----
+public class CustomFiltertypeRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig")
+                        && !bean.contains("customMarkerInterface"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(1)
+                .containsExactlyInAnyOrder("springBean");
+    }
+}
+----
 
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
