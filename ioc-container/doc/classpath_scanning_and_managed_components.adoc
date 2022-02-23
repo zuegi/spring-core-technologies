@@ -231,10 +231,10 @@ public enum FilterType {
 |===
 |ColumnFilter Type| Beispiel | Beschreibung
 |ANNOTATION | link:#ANNOTATION[SayHelloBean.java] | Eine benutzerdefinierte Annotation
-|ASSIGNABLE_TYPE | link:#ASSIGNABLE_TYPE[BenutzerDefinierterScan.java] |
-|ASPECTJ | |
-|REGEX | |
-|CUSTOM | |
+|ASSIGNABLE_TYPE | link:#ASSIGNABLE_TYPE[BenutzerDefinierterScan.java] | Eine spezifische Klasse oder Interface, welche gesucht und zugewiesen wird.
+|ASPECTJ | link:#REGEX[FiltertypeRegexjRunner.java.java] | Eine Regex
+|REGEX |  link:#ASPECTJ[FiltertypeAspectjRunner.java] |
+|CUSTOM | link:#CUSTOM[BenutzerDefinierterScan.java] |
 |===
 
 === [[ANNOTATION]]FilterType ANNOTATION
@@ -379,8 +379,108 @@ public class CustomComponentScan {
 ----
 
 
+=== [[REGEX]]FilterType REGEX
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/regex/FiltertypeRegexRunner.java[FiltertypeRegexRunner.java]
+
+Am Beispiel der Runner Klasse mit einer JUnit Assertion von AssertJ.
+
+[source, java]
+----
+public class FiltertypeRegexRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig")
+                        && !bean.contains("regexMarkerInterface"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(2)
+                .containsExactlyInAnyOrder("springBean", "springBean2");
+    }
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/regex/config/AppConfig.java[AppConfig.java]
+Und der AppConfig, welche über die includeFilters nach Beans mit einer REGEX suchen.
+
+[source, java]
+----
+@Configuration
+@ComponentScan(basePackageClasses = {RegexMarkerInterface.class},
+        includeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+        pattern = ".*gB.*"))
+public class AppConfig {
+}
+----
+
+=== [[ASPECTJ]]FilterType ASPECTJ
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/aspectj/config/AppConfig.java[AppConfig.java]
+
+Mit den gegebenen Klassen
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/aspectj/beans/SpringBean.java[SpringBean.java],
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/aspectj/beans/SpringBean2.java[SpringBean2.java] und link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/aspectj/beans/Spring2Bean.java[Spring2Bean.java]
+
+wird in der AppConfig das Pattern für den ComponentScan über den FilterType Aspectj zusammengestellt.
+[source, java]
+----
+@Configuration
+@ComponentScan(basePackageClasses = {AspectJMarkerInterface.class},
+        includeFilters = @ComponentScan.Filter(type = FilterType.ASPECTJ,
+        pattern = "ch.wesr.spring.core.container.annotation.componentscan.filtertype.aspectj.beans.* "
+                + "&& !(ch.wesr.spring.core.container.annotation.componentscan.filtertype.aspectj.beans.Spring2* "
+                + "|| ch.wesr.spring.core.container.annotation.componentscan.filtertype.aspectj.beans.*Bean2)"))
+public class AppConfig {
+}
+----
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/filtertype/aspectj/FiltertypeAspectjRunner.java[FiltertypeAspectjRunner.java]
+
+Die Ausführung wird über den Runner ermöglicht.
+
+[source, java]
+----
+public class FiltertypeAspectjRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig")
+                        && !bean.contains("aspectJMarkerInterface"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(1)
+                .containsExactlyInAnyOrder("springBean");
+    }
+}
+----
+
+
+=== [[CUSTOM]]FilterType CUSTOM
+
+==== link:{sourcedir}[]
+
+[source, java]
+----
+
+----
+
+
+==== link:{sourcedir}[]
+
+[source, java]
+----
+
+----
+
+
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
+* https://www.baeldung.com/spring-componentscan-filter-type
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
 
