@@ -515,6 +515,76 @@ public class CustomFiltertypeRunner {
 }
 ----
 
+== 1.10.5 Definiere Bean Metadata mit Components bzw. registriere Beans aus @Components Klassen
+Spring Components, also Klassen, welche mit @Component annotiert sind, können ebenfalls Metadaten für Bean Definitionen in den Container einbringen, also registriert werden.
+
+Das geschieht mit einer ganz gewöhnlichen @Bean Annotation. Dabei ist die SpringBeanExplorer Bean eine normale Komponente mit Methoden und eben einer @Bean Annotation, welche damit die SpringBean zur Verfügung stellt.
+Ebenso kann die @Bean Annotation mit weiteren Annotation wie @Qualifier, @Lazy oder @Scope ergänzt werden.
+
+[source, java]
+---
+@Component
+public class SpringBeanExplorer {
+
+    @Bean
+    public SpringBean springBean() {
+        return new SpringBean();
+    }
+
+    public void explore()
+        // eine ganz normale Methode der SpringExplorer Component
+    }
+}
+---
+
+[CAUTION]
+----
+@Component classes are not CGLIB proxied.
+
+Was bedeutet das?
+CGLIB wird verwendet um Beans aus @Configuration Klassen zu erzeugen. Dabei wird eine Proxy Klasse erstellt, welche auch den Zugriff auf Methoden und Felder der erzeugten Bean regelt. Mit diesem Vorgehen werden die üblichen Lebenszyklen der Beans im Container durchlaufen.
+Der Nachteil dabei ist, dass die @Bean Definition nicht statisch sein darf.
+
+Zudem werden @Bean Definitionen in @Component Klassen nicht über CGLIB erstellt und durchlaufen deshalb nicht das Lebenszyklus-Management und Proxy Funktionalität des Containers.
+----
+
+== 1.10.6 Naming Autedected Components
+Wenn eine Komponenten durch den Scanning Prozess automatisch erkannt wird, dann wird der Bean Name durch die *BeanNameGenerator* Strategie des Component Scanner definiert.
+Jede Spring stereotypen Annotation wie @Component, @Repository, @Service, and @Controller, welche ein Field *name* vorweisen, bietet das Überschreiben des Bean Namens an.
+
+[source, java]
+----
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Component
+public @interface Controller {
+    @AliasFor(
+        annotation = Component.class
+    )
+    String value() default "";
+}
+----
+
+Als Beispiel kann einem Service folgender Namen mitgegeben werden.
+
+==== link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/autodectednaming/ServiceBean.java[ServiceBean.java]
+
+[source,java]
+----
+@Service("meineHerzallerliebsteServiceBean")
+public class ServiceBean {
+    // ...
+}
+----
+
+Der Beweis wird in der link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/autodectednaming/NamingAutodetectedComponentRunner.java[NamingAutodetectedComponentRunner.java] erbracht.
+
+
+
+
+
+
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
 * https://www.baeldung.com/spring-componentscan-filter-type
