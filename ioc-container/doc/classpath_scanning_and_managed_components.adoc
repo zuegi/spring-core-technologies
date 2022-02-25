@@ -582,7 +582,7 @@ Der Beweis wird in der link:{sourcedir}/ch/wesr/spring/core/container/annotation
 
 
 
-
+!!!!! Custom Bean Naming Strategie  Code Beispiel schreiben !!!!!
 
 
 == Referenzen
