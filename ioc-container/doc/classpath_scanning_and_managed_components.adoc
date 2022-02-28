@@ -581,13 +581,103 @@ public class ServiceBean {
 Der Beweis wird in der link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/autodectednaming/NamingAutodetectedComponentRunner.java[NamingAutodetectedComponentRunner.java] erbracht.
 
 
+== 1.10.6.1 Custom Bean Naming Strategy
 
-!!!!! Custom Bean Naming Strategie  Code Beispiel schreiben !!!!!
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/custombeannaming/config/CustomBeanNameGenerator.java[CustomBeanNameGenerator.java]
+
+Es gibt auch die Möglichkeit eine benutzerdefinierte BeanNaming Strategie zu erstellen. Dies wird über eine Bean, welche das Interface *BeanNameGenerator* implementiert ermöglicht.
+Auch wenn das Beispiel nicht wirklich sinnvoll ist, so zeigt es trotzdem das Konzept auf. Man könnte sich diesen BeanNameGenerator z.B. für Modulnamen vorstellen.
+
+[source, java]
+----
+public class CustomBeanNameGenerator implements BeanNameGenerator {
+    @Override
+    public String generateBeanName(BeanDefinition beanDefinition, BeanDefinitionRegistry beanDefinitionRegistry) {
+        String beanClassName = beanDefinition.getBeanClassName();
+        String simpleClassname = beanClassName.substring(beanClassName.lastIndexOf('.') + 1);
+
+        return "meineAllerwelts"+simpleClassname;
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/custombeannaming/config/AppConfig.java[AppConfig.java]
+
+In der AppConfig wird der CustomBeanNameGenerator in der @ComponentScan Annotation über das Attribut *nameGenerator* verwendet.
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackageClasses = {BeanMarkerInterface.class}, nameGenerator = CustomBeanNameGenerator.class)
+public class AppConfig {
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/custombeannaming/CustomBeanNamingRunner.java[CustomBeanNamingRunner.java]
+
+[source, java]
+----
+public class CustomBeanNamingRunner {
+
+    public static void main(String[] args) {
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(1)
+                .containsExactly("meineAllerweltsSpringBean");
+    }
+}
+----
+
+== 1.10.7. Providing a Scope for Autodetected Components
+Aktuell gibt es 6 verschiedene Scope Typen
+
+* singleton
+* prototype
+* request
+* session
+* application
+* websocket
+
+Der am meisten verwendete Scope ist der *singleton* Scope. Trotzdem ist es manchmal nötig einen anderen Scope zu verwenden.
+Dies geschieht dann über die *@Scope* Annotation.
+
+[source,java]
+----
+@Scope("prototype")
+@Bean
+public class SpringBean {
+    // ...
+}
+----
+
+Die Standard Bean Scopes können nicht überschrieben werden, zudem sind nur die beiden Scopes singleton und prototype in allen Spring Applikationen einsetzbar. Die anderen oben erwähnten sind nur in web-aware Applikationen zu verwenden.
+
+Dabei gibt es wie so soft in Spring einen Weg einen benutzerdefinierten Scope zu definieren. Dazu gibt es 2 Möglichkeiten
+
+* BeanFactoryPostProcessor
+* ScopeMetadataResolver
+
+==== Custom Scope über den BeanFactoryPostProcessor registrieren
+Einen Custom Scope zu registrieren und zu verwenden.
+
+!!!! Code Beispiel hier link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/customscope/CustomScopeResolutionRunner.java[CustomScopeResolutionRunner]
+
+
+====  public class CustomScopeMetadataResolver implements ScopeMetadataResolver {}
+funktioniert überhaupt nicht so wie ich mir das vorstelle...
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/customscoperesolver/CustomScopeMetadataRunner.java[CustomScopeMetadataRunner.java]
 
 
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
 * https://www.baeldung.com/spring-componentscan-filter-type
+* https://github.com/woniper/spring-example/blob/master/spring-boot-custom-bean-name-generator/src/main/java/net/woniper/bean/generator/CustomBeanNameGenerator.java[CustomBeanNameGenerator.java Beispiel auf Github]
+* https://www.baeldung.com/spring-bean-scopes[Baeldung - Bean-Scopes]
+* https://www.baeldung.com/spring-custom-scope[Baeldung - Spring Custom Cope]
 
 link:{docudir}/spring-ioc-container.md[zurück zu spring-ioc-container]
 
