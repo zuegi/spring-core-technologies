@@ -1,0 +1,36 @@
+= Classpath Scanning und Managed Components
+:sourcedir: ../src/main/java
+:resourcedir: ../src/main/resources
+:docudir: ..
+:toc:
+:sectnumlevels: 5
+
+* @Bean und @Configuration
+* AnnotationConfigApplicationContext
+* 5 Zusammengesetzte Java-based Configurations
+* Bean Defintio Profiles
+* PropertySource
+* Placeholder Auflösung in Statements
+
+== 1.12.1 @Bean und @Configuration
+
+Die Lite vs. Full Komposition einer Bean habe ich nicht verstanden resp. mein Beispiel funktioniert so nicht.
+
+=== Full ist noch verständlich, Lite leider nicht mehr
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/litebeans/LiteBeanRunner.java[LiteBeanRunner.java]
+
+
+== 1.12.2 AnnotationConfigApplicationContext
+
+== 1.12.3 @Bean Annotation
+
+== 1.12.4 @Configuration Annotation
+
+== 1.12.5 Zusammengesetzte Java-based Configurations
+
+
+== Referenzen
+
+* https://stackoverflow.com/questions/51069703/behaviour-of-lite-bean-methods-in-spring-5
+* https://developpaper.com/do-you-really-understand-spring-java-config-full-configuration-vs-lite-bean-mode/

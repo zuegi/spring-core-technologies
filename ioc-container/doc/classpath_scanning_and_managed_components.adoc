@@ -671,6 +671,32 @@ Einen Custom Scope zu registrieren und zu verwenden.
 funktioniert überhaupt nicht so wie ich mir das vorstelle...
 link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/customscoperesolver/CustomScopeMetadataRunner.java[CustomScopeMetadataRunner.java]
 
+== 1.10.8. Providing Qualifier Metadata with Annotations
+ist in  *Fine-tuning Annotation-based Autowiring mit @Qualifier* schon beschrieben.
+
+
+== 1.10.9. Generating an Index of Candidate Components
+Obwohl das Scannen des Klassenpfads sehr schnell ist, ist es möglich, die Startleistung von großen Anwendungen zu verbessern, indem eine statische Liste von Kandidaten zur Kompilierungszeit erstellt wird. In diesem Modus müssen alle Module, die Ziel der Komponentensuche sind, diesen Mechanismus verwenden.
+
+Ich überhüpfe diesen Teil, weil ich das nicht für so wichtig halte!
+
+
+== 1.11. Using JSR 330 Standard Annotations
+Ab Spring 3.0 bietet Spring Unterstützung für JSR-330-Standardannotationen (Dependency Injection). Diese Annotationen werden auf die gleiche Weise wie die Spring-Annotationen gescannt. Um sie zu verwenden, müssen Sie die entsprechenden Jars in Ihrem Klassenpfad haben.
+
+[source,xml]
+----
+<dependency>
+    <groupId>javax.inject</groupId>
+    <artifactId>javax.inject</artifactId>
+    <version>?</version>
+</dependency>
+----
+
+* Instead of @Autowired, you can use @javax.inject.Inject as follows:
+* Instead of @Component, you can use @javax.inject.Named or javax.annotation.ManagedBean
+
+Grundsätzlich vermeide diese Annotationen im Spring Umfeld, da sowieso nicht alle Annotationen (z.B. @Value, @Lazy, ...) verfügbar sind.
 
 == Referenzen
 * https://www.logicbig.com/tutorials/spring-framework/spring-core/javaconfig-with-componnet-scan.html
