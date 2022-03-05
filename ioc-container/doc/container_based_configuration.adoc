@@ -156,8 +156,115 @@ link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/beans/S
 link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/BeanInterfaceRunner.java[BeanInterfaceRunner.java]
 
 == 1.12.4 @Configuration Annotation
+Wurde schon hinreichend in diversen Beispielen angewendet.
 
 == 1.12.5 Zusammengesetzte Java-based Configurations
+In der Java Based Spring Konfiguration können Annotationen zusammengestellt werden, sodass sie z.T. komplexe Konfigurationen vereinfachen bwz. Modularisieren können. Diese Form wird oft in grossen Applikationen, mit mehreren Modulen verwendet.
+
+=== Die @Import Annotation
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/composedconfig/config/AppConfigA.java[AppConfigA.java]
+
+Wie das folgende Beispiel zeigt, muss bei der Instanziierung des Kontexts nicht sowohl ConfigA.class als auch ConfigB.class angegeben werden, sondern nur ConfigA explizit:
+[source,java]
+----
+@Configuration
+@Import({AppConfigB.class})
+public class AppConfigA {
+
+    @Bean
+    public SpringBeanA springBeanA() {
+        return new SpringBeanA();
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/composedconfig/config/AppConfigA.java[AppConfigA.java]
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/composedconfig/ComposedConfigRunner.java[ComposedConfigRunner.java]
+
+Ab Spring Framework 4.2 unterstützt @Import auch Referenzen auf reguläre Komponentenklassen, analog zur Methode AnnotationConfigApplicationContext.register. Dies ist besonders nützlich, wenn Sie das Scannen von Komponenten vermeiden möchten, indem Sie einige wenige Konfigurationsklassen als Einstiegspunkte verwenden, um alle Ihre Komponenten explizit zu definieren.
+
+==== Injecting Dependencies on Imported @Bean Definitions
+Die obigen Beispiele waren sehr einfach. In vielen Applikationen sind Beans über Konfigurationsklassen hinweg in Abhängigkeiten zueineander.
+Bei der Verwendung von XML ist dies kein Problem, da kein Compiler involviert ist und man ref="someBean" deklarieren und darauf vertrauen kann, dass Spring dies während der Container-Initialisierung regelt. Bei der Verwendung von @Configuration-Klassen erlegt der Java-Compiler dem Konfigurationsmodell Beschränkungen auf, da Verweise auf andere Beans gültige Java-Syntax sein müssen.
+Glücklicherweise ist dieses Problem einfach zu lösen. Eine @Bean-Methode kann eine beliebige Anzahl von Parametern haben, die die Bean-Abhängigkeiten beschreiben. Betrachten wir das folgende, realistischere Szenario mit mehreren @Configuration-Klassen, von denen jede von Beans abhängt, die in den anderen deklariert sind:
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/injection/config/SystemConfig.java[SystemConfig.java]
+Die SystemConfig Klasse import die beiden Konfigurationsklassen für link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/injection/config/ServiceConfig.java[ServiceConfig] und link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/injection/config/RepositoryConfig.java[RepositoryConfig].
+[source,java]
+----
+@Import({ServiceConfig.class, RepositoryConfig.class})
+@Configuration
+public class SystemConfig {
+
+    @Bean
+    public MeineDataSource dataSource() {
+        return new MeineDataSource();
+    }
+}
+----
+
+Und die Runner Klasse link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/injection/BeanInjectionRunner.java[BeanInjectionRunner.java]
+[source, java]
+----
+public class BeanInjectionRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(SystemConfig.class);
+
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                    && !bean.contains("ch.wesr.spring.core.container.annotation.javabased.injection.config")
+                    && !bean.contains("systemConfig"))
+                .collect(Collectors.toList());
+
+        Assertions.assertThat(beans)
+                .hasSize(3)
+                .containsExactly("springBeanService", "accountRepository", "dataSource");
+    }
+}
+----
+
+Es gibt aber auch noch eine andere Möglichkeit dasselbe Resultat zu erzielen.
+@Configuration-Klassen sind letztlich nur eine weitere Bean im Container sind: Das bedeutet, dass sie die Vorteile von @Autowired und @Value-Injection und anderen Funktionen genauso nutzen können wie jede andere Bean auch.
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/autowired/config/RepositoryConfig.java[RepositoryConfig.java]
+[source,java]
+----
+@Configuration
+public class RepositoryConfig {
+
+    @Autowired
+    MeineDataSource dataSource;
+
+    @Bean
+    public AccountRepository accountRepository() {
+        return new JdbcAccountRepository(dataSource);
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/autowired/config/ServiceConfig.java[ServiceConfig.java]
+[source,java]
+----
+@Configuration
+public class ServiceConfig {
+
+    @Autowired
+    AccountRepository accountRepository;
+
+    @Bean
+    public SpringBeanService springBeanService() {
+        return new SpringBeanService(accountRepository);
+    }
+}
+----
+
+Obiges Beispiel funktioniert nur dann einwandfrei, solange die Abhängigkeiten von einfacher Art sind.
+@Configuration-Klassen werden während der Initialisierung des Kontexts recht früh verarbeitet, und eine auf diese Weise erzwungene Injektion einer Abhängigkeit kann zu einer unerwarteten frühen Initialisierung führen.
+Wann immer möglich, sollten Sie auf parameterbasierte Injektion zurückgreifen, wie im vorangegangenen Beispiel.
+Besonders BeanPostProcessor- und BeanFactoryPostProcessor-Definitionen sind durch @Bean Annotation anfällig Problem zu verursachen.. Diese sollten in der Regel als statische @Bean-Methoden deklariert werden, die nicht die Instanziierung der sie enthaltenden Konfigurationsklasse auslösen. Andernfalls funktionieren @Autowired und @Value möglicherweise nicht für die Konfigurationsklasse selbst, da es möglich ist, sie als Bean-Instanz vor dem AutowiredAnnotationBeanPostProcessor zu erstellen.
 
 
 == Referenzen
