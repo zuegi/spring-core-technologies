@@ -23,7 +23,137 @@ link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/litebeans/Li
 
 == 1.12.2 AnnotationConfigApplicationContext
 
+Den AnnotationConfigApplicationContext wurde schon in einigen Beispielen stillschweigend verwendet, so in
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/componentscan/custombeannaming/CustomBeanNamingRunner.java[CustomBeanNamingRunner.java].
+
+1. Der AnnotationConfigApplicationContext ist der eigenständige Anwendungskontext, der sowohl @Configuration-Klassen als auch einfache @Component-Klassen akzeptiert.
+2. Der AnnotationConfigApplicationContext  akzeptiert auch JSR-330-konforme Klassen mit javax.inject-Annotationen.
+3. Über den AnnotationConfigApplicationContext können Klassen über die Methode *register(Class<?>....)* registriert werden
+4. Mit der AnnotationConfigApplicationContext können über die Methode *scan(String...)* Klassenpfade gescanned werden.
+5. Im Falle mehrerer @Configuration-Klassen überschreiben die in späteren Klassen definierten @Bean-Methoden die in früheren Klassen definierten.
+
+Folgende Methoden hat der AnnotationConfigApplicationContext.
+
+* *register*: Registrieren einer oder mehrerer @Componenten Klassen oder @Configuration Klassen.
+* *registerBean*: Registriert eine Bean aus der angegebenen Bean-Klasse, wobei der angegebene Lieferant verwendet wird, um eine neue Instanz zu erhalten.
+* *scan*: Führt einen Scan innerhalb des angegebenen Basispakets durch.
+* *setBeanNameGenerator*: Setzt einen benutzerdefinierten BeanNameGenerator.
+* *setEnvironment*: Propagiert die angegebene benutzerdefinierte Umgebung.
+* *setScopeMetadataResolver*: Legt den ScopeMetadataResolver fest, der für registrierte Komponentenklassen verwendet werden soll.
+
+=== Building the Container Programmatically by Using register(Class<?>...)
+
+Man kan einen AnnotationConfigApplicationContext mit einem No-Arg-Konstruktor instanziieren und ihn dann mit der register()-Methode konfigurieren.
+Dieser Ansatz ist besonders nützlich, wenn ein AnnotationConfigApplicationContext programmatisch erstellt wird.
+Beachte in diesem Beispiel den *context.refresh()* Methodenaufruf. Ohne den gibt es eine IllegalStateException.
+
+[source,text]
+----
+Exception in thread "main" java.lang.IllegalStateException: org.springframework.context.annotation.AnnotationConfigApplicationContext@69663380 has not been refreshed yet
+	at org.springframework.context.support.AbstractApplicationContext.assertBeanFactoryActive(AbstractApplicationContext.java:1141)
+	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1171)
+	at ch.wesr.spring.core.container.annotation.javabased.containerconfig.RegisterContainerConfigurationRunner.main(RegisterContainerConfigurationRunner.java:14)
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/containerconfig/RegisterContainerConfigurationRunner.java[RegisterContainerConfigurationRunner.java]
+[source,java]
+----
+public class RegisterContainerConfigurationRunner {
+
+    public static void main(String[] args) {
+
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.register(AppConfig.class);
+        context.refresh();
+        SpringBean bean = context.getBean(SpringBean.class);
+        bean.sayHello();
+    }
+}
+----
+
+=== Building the Container Programmatically by Using scan(Class<?>...)
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/containerconfig/ScanContainerConfigRunner.java[ScanContainerConfigRunner.java]
+[source,java]
+----
+public class ScanContainerConfigRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.scan("ch.wesr.spring.core.container.annotation.javabased.containerconfig.bean");
+        context.refresh();
+        ScannedSpringBean bean = context.getBean(ScannedSpringBean.class);
+        bean.sayHello();
+    }
+}
+----
+
+ @Configuration-Klassen sind mit @Component meta-annotiert sind, so dass sie Kandidaten für das Komponenten-Scanning sind. Wenn AppConfig im vorangegangenen Beispiel im *ch.wesr.spring.core.container.annotation.javabased.containerconfig*-Paket (oder einem darunter liegenden Paket) deklariert ist, wird es beim Aufruf von scan() erfasst. Bei refresh() werden alle seine @Bean-Methoden verarbeitet und als Bean-Definitionen innerhalb des Containers registriert.
+
+=== AnnotationConfigWebApplicationContext
+Eine WebApplicationContext-Variante von AnnotationConfigApplicationContext ist mit AnnotationConfigWebApplicationContext verfügbar.
+Das werde ich aber an dieser Stelle nicht weiter verfolgen
+
 == 1.12.3 @Bean Annotation
+Über Beans wurde schon ausführlich mit XML Konfiguration gesprochen - die Annotierte Version unterscheided sich da nicht wirklich. Auch hier gibt es folgende Möglichkeiten ein Bean über die folgenden Attribute zu konfigurieren
+
+* init-methode
+* destroy-method
+* autowiring
+* name
+
+==== Bean Defintion mit einem Interface
+
+Die Verwendung von Standardmethoden um Beans zu definieren ermögliche die Zusammenstellung von Bean Konfigurationen durch die Implementierung von Interfaces mit Bean Defintionen auf Standardmethoden.
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/config/BaseConfig.java[BaseConfig.java]
+[source, java]
+----
+public interface BaseConfig {
+
+    @Bean
+    default SpringBeanImpl springBean() {
+        return new SpringBeanImpl();
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/config/AppConfig.java[AppConfig.java]
+[source,java]
+----
+@ComponentScan(basePackages = "ch.wesr.spring.core.container.annotation.javabased.bean.beans")
+@Configuration
+public class AppConfig implements BaseConfig{
+}
+----
+
+Der entsprechende Runner des Codes
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/BeanRunner.java[BeanRunner.java]
+
+
+=== Brauche ich ein Interface in Spring?
+
+Unter https://dimitr.im/spring-interface gibt es eine gute Erklärung dazu. Die kurze Antwort lautet: Nein.
+Trotzdem gibt es natürlich die Möglichkeit Interfaces auf für Beans einzusetzen, wie dieses Beispiel zeigt:
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/config/AppIfcConfig.java[AppIfcConfig.java]
+
+[source,java]
+----
+public class AppIfcConfig {
+
+    @Bean
+    public SpringBeanIfc springBean() {
+        return new SpringBeanImpl();
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/beans/SpringBeanIfc.java[SpringBeanIfc.java]
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/beans/SpringBeanImpl.java[SpringBeanImpl.java]
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/bean/BeanInterfaceRunner.java[BeanInterfaceRunner.java]
 
 == 1.12.4 @Configuration Annotation
 
