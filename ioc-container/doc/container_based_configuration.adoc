@@ -267,7 +267,143 @@ Wann immer möglich, sollten Sie auf parameterbasierte Injektion zurückgreifen,
 Besonders BeanPostProcessor- und BeanFactoryPostProcessor-Definitionen sind durch @Bean Annotation anfällig Problem zu verursachen.. Diese sollten in der Regel als statische @Bean-Methoden deklariert werden, die nicht die Instanziierung der sie enthaltenden Konfigurationsklasse auslösen. Andernfalls funktionieren @Autowired und @Value möglicherweise nicht für die Konfigurationsklasse selbst, da es möglich ist, sie als Bean-Instanz vor dem AutowiredAnnotationBeanPostProcessor zu erstellen.
 
 
+=== Conditionally Include @Configuration Classes or @Bean Methods
+
+==== Conditional @Configuration Implementierung
+Beachte bei der *Condition Implementierung muss das Interface ConfigurationCondition verwendet werden mit der entsprechenden  ConfigurationPhase!
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/config/HelloConfig.java[HelloConfig.java]
+
+Diese @Configuration Klasse beinhaltet die Erstellung des @Bean link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/beans/HelloSpringBean.java[HelloSpringBean].
+
+[source,java]
+----
+@Configuration
+@Conditional(IsSayHelloCondition.class)
+public class HelloConfig {
+
+    @Bean
+    public HelloSpringBean helloSpringBean() {
+        return new HelloSpringBean();
+    }
+
+}
+----
+
+Die @Conditional Implemententierung
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/condition/IsSayHelloCondition.java[IsSayHelloCondition.java]
+
+[source,java]
+----
+public class IsSayHelloCondition implements ConfigurationCondition {
+
+    public static final String HELLO_FROM = "hello from";
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        return context.getEnvironment().getProperty("sayAnything").equals(HELLO_FROM);
+    }
+
+    @Override
+    public ConfigurationPhase getConfigurationPhase() {
+        return ConfigurationPhase.REGISTER_BEAN;
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/config/GoodbyeConfig.java[GoodbyeConfig.java]
+
+Diese @Configuration Klasse beinhaltet die Erstellung des @Bean link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/beans/GoodbySpringBean.java[GoodbySpringBean].
+
+[source,java]
+----
+@Configuration
+@Conditional(IsSayGoodbyeCondition.class)
+public class GoodbyeConfig {
+
+    @Bean
+    public SpringBeanIfc goodbyeSpringBean() {
+        return new GoodbySpringBean();
+    }
+}
+----
+
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/condition/IsSayGoodbyeCondition.java[IsSayGoodbyeCondition.java]
+
+[source,java]
+----
+public class IsSayGoodbyeCondition implements ConfigurationCondition {
+    public static final String GOODBYE_FROM = "goodbye from";
+
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+       return context.getEnvironment().getProperty("sayAnything").equals(GOODBYE_FROM);
+    }
+
+    @Override
+    public ConfigurationPhase getConfigurationPhase() {
+        return ConfigurationPhase.REGISTER_BEAN;
+    }
+}
+----
+=== Die Runner (Main) Klasse
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/javabased/conditionalconfiguration/ConditionalConfigRunner.java[ConditionalConfigRunner.java]
+
+Im ConditionalConfigRunner werden 2 verschiedene Contexte hochgefahren und mit den entsprechenden Config Klassen registriert, aber jeweils nur eine der beiden Configuration wird aktiv aufgrunder Condition.
+
+[source,java]
+----
+public class ConditionalConfigRunner {
+
+    public static void main(String[] args) {
+        System.setProperty("sayAnything", IsSayHelloCondition.HELLO_FROM);
+
+        AnnotationConfigApplicationContext helloContext = new AnnotationConfigApplicationContext();
+        helloContext.register(HelloConfig.class, GoodbyeConfig.class);
+        helloContext.refresh();
+
+        List<String> helloBeans = Arrays.stream(helloContext.getBeanDefinitionNames())
+                .filter(helloBean -> !helloBean.contains("org.springframework"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(helloBeans)
+                .hasSize(2)
+                .containsExactly("helloConfig", "helloSpringBean");
+
+        SpringBeanIfc sayHello = helloContext.getBean(SpringBeanIfc.class);
+        sayHello.sayAnything();
+
+        helloContext.close();
+
+        // ---------------------------------------------------------
+
+        System.setProperty("sayAnything", IsSayGoodbyeCondition.GOODBYE_FROM);
+
+        AnnotationConfigApplicationContext goodbyeContext = new AnnotationConfigApplicationContext();
+        goodbyeContext.register(HelloConfig.class, GoodbyeConfig.class);
+        goodbyeContext.refresh();
+
+        List<String> goodbyeBeans = Arrays.stream(goodbyeContext.getBeanDefinitionNames())
+                .filter(goodbyeBean -> !goodbyeBean.contains("org.springframework"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(goodbyeBeans)
+                .hasSize(2)
+                .containsExactly("goodbyeConfig", "goodbyeSpringBean");
+
+        SpringBeanIfc sayGoodbye = goodbyeContext.getBean(SpringBeanIfc.class);
+        sayGoodbye.sayAnything();
+
+    }
+}
+----
+
+==== Conditional Bean Example
+
+!!! Todo !!!!
+
 == Referenzen
 
 * https://stackoverflow.com/questions/51069703/behaviour-of-lite-bean-methods-in-spring-5
 * https://developpaper.com/do-you-really-understand-spring-java-config-full-configuration-vs-lite-bean-mode/
+* https://www.logicbig.com/tutorials/spring-framework/spring-core/bean-conditional-registration.html"
+* https://turreta.com/2018/08/20/using-conditional-with-configuration-in-spring/
