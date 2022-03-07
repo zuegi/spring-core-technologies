@@ -1,4 +1,4 @@
-= Classpath Scanning und Managed Components
+= Java-base Container Configuration
 :sourcedir: ../src/main/java
 :resourcedir: ../src/main/resources
 :docudir: ..

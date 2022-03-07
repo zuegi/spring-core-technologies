@@ -652,6 +652,7 @@ Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen 
 
 ## 1.10 [Classpath Scanning und Managed Components](doc/classpath_scanning_and_managed_components.adoc)
 ## 1.11. Using JSR 330 Standard Annotations (ist in 1.10 enthalten)
-## 1.12 [Java-base Container Configurtion](doc/container_based_configuration.adoc)
+## 1.12 [Java-base Container Configuration](doc/container_based_configuration.adoc)
+## 1.13 [Environment Abstraction](doc/environment_abstraction.adoc)
 ## to be completed
 

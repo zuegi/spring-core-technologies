@@ -1,0 +1,6 @@
+= Environment Abstraction
+:sourcedir: ../src/main/java
+:resourcedir: ../src/main/resources
+:docudir: ..
+:toc:
+:sectnumlevels: 5
