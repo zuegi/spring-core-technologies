@@ -1,0 +1,9 @@
+package ch.wesr.spring.core.container.annotation.environment.profile.config;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@ComponentScan(basePackages = "ch.wesr.spring.core.container.annotation.environment.profile")
+@Configuration
+public class AppConfig {
+}

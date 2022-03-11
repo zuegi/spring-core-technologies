@@ -4,3 +4,28 @@
 :docudir: ..
 :toc:
 :sectnumlevels: 5
+
+
+Das Environment Interface ist eine in den Container integrierte Abstraktion, die zwei wichtige Aspekte der Anwendungsumgebung modelliert:
+
+* Profile
+* Properties
+
+== 1.13.1 Bean Definition Profiles
+
+Profile werden im Spring IoC Container verwendet umd verschiedene Bean Definitionen in verschiedenen Environments zu registrieren. Environment kann dabei verschiedene Vorstellungen hervorrufen wie
+
+* Unterschiedliche DataSource Konfiguration für verschiedene Stages/Laufzeitstufen
+* InMemory Konfigurationen wie Datenbanken oder Security
+* Mandantenspezifische Konfigurationen zur Unterscheidung von Mandant A zu Mandant B Deployments
+* und weitere mehr
+
+=== @Profile
+
+!!! Beispiel codiert und hier zum Dokumentieren !!!!
+
+
+
+== Referenzen
+* https://mkyong.com/spring/spring-profiles-example/
+
