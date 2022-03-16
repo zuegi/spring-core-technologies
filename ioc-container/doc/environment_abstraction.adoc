@@ -23,8 +23,10 @@ Profile werden im Spring IoC Container verwendet umd verschiedene Bean Definitio
 === @Profile
 
 !!! Beispiel codiert und hier zum Dokumentieren !!!!
+lhalll
 
 
+und der profile Aufruf mit maven ebenfalls hier dokumentieren
 
 == Referenzen
 * https://mkyong.com/spring/spring-profiles-example/
