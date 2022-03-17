@@ -22,8 +22,84 @@ Profile werden im Spring IoC Container verwendet umd verschiedene Bean Definitio
 
 === @Profile
 
-!!! Beispiel codiert und hier zum Dokumentieren !!!!
-lhalll
+Beim Profile
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/profile/ProfileRunner.java[ProfileRunner.java] starten wir 2 verschiedene Kontexte mit unterschiedlichen Profilen.
+
+[source,java]
+----
+public class ProfileRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.getEnvironment().setActiveProfiles("aprofile");
+        context.register(AppConfig.class);
+        context.refresh();
+
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(2)
+                .containsExactly("AConfiguration", "springBean");
+
+        SpringBean bean = context.getBean(SpringBean.class);
+        bean.sayHello();
+        context.close();
+
+
+        AnnotationConfigApplicationContext contextB = new AnnotationConfigApplicationContext();
+        contextB.getEnvironment().setActiveProfiles("bprofile");
+        contextB.register(AppConfig.class);
+        contextB.refresh();
+
+        List<String> beansB = Arrays.stream(contextB.getBeanDefinitionNames())
+                .filter(beanB -> !beanB.contains("org.springframework")
+                        && !beanB.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beansB)
+                .hasSize(2)
+                .containsExactly("BConfiguration", "springBean");
+
+        SpringBean beanB = contextB.getBean(SpringBean.class);
+        beanB.sayHello();
+        contextB.close();
+    }
+}
+----
+
+Die beiden A- und link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/profile/config/AConfiguration.java[BConfiguration.java] Klassen sind mit @Profile annotiert, hier am Beispiel der Klasse link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/profile/config/AConfiguration.java[AConfiguration.java].
+
+[source,java]
+----
+@Profile("aprofile")
+@Configuration
+public class AConfiguration {
+
+    @Bean
+    public SpringBean springBean () {
+        return new SpringBeanA();
+    }
+}
+----
+
+Der String im @Profile kann wie im Beispiel einen einfachen Ausdruck besitzen, oder aber einen kompliziertere Logik verwenden. Folgende Operatoren können für die ProfilAusdrücke verwendet werden.
+
+* *!*: A logical “not” of the profile
+* *&*: A logical “and” of the profiles
+* *|*: A logical “or” of the profiles
+
+[IMPORTANT]
+====
+Die Operatoren *&* und *|* können nicht gemischt werden, ohne Klammern zu verwenden.
+
+Z.B. ist folgender Ausdruck nicht zulässig: "production & us-east | eu-central", sondern muss folgendermassen geschrieben werden: "production & (us-east | eu-central)"
+====
+
+==== @Profile auf Methodenebene
+@Profile kann auch auf Methodenebene deklariert werden, um nur eine bestimmte Bean einer Konfigurationsklasse einzuschließen (z. B. für alternative Varianten einer bestimmten Bean), wie das folgende Beispiel zeigt:
+
+!!!! Beispiel auscodieren oder einfach hier ausweisen !!!
 
 
 und der profile Aufruf mit maven ebenfalls hier dokumentieren

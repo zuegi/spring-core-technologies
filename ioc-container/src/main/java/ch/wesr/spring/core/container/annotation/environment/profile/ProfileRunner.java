@@ -27,5 +27,24 @@ public class ProfileRunner {
 
         SpringBean bean = context.getBean(SpringBean.class);
         bean.sayHello();
+        context.close();
+
+
+        AnnotationConfigApplicationContext contextB = new AnnotationConfigApplicationContext();
+        contextB.getEnvironment().setActiveProfiles("bprofile");
+        contextB.register(AppConfig.class);
+        contextB.refresh();
+
+        List<String> beansB = Arrays.stream(contextB.getBeanDefinitionNames())
+                .filter(beanB -> !beanB.contains("org.springframework")
+                        && !beanB.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beansB)
+                .hasSize(2)
+                .containsExactly("BConfiguration", "springBean");
+
+        SpringBean beanB = contextB.getBean(SpringBean.class);
+        beanB.sayHello();
+        contextB.close();
     }
 }
