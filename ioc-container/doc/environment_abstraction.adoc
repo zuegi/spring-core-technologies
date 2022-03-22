@@ -96,10 +96,110 @@ Die Operatoren *&* und *|* können nicht gemischt werden, ohne Klammern zu verwe
 Z.B. ist folgender Ausdruck nicht zulässig: "production & us-east | eu-central", sondern muss folgendermassen geschrieben werden: "production & (us-east | eu-central)"
 ====
 
+[IMPORTANT]
+====
+Wenn eine @Configuration-Klasse mit @Profile markiert ist, werden alle @Bean-Methoden und @Import-Annotationen, die mit dieser Klasse verbunden sind, umgangen, sofern nicht eines oder mehrere der angegebenen Profile aktiv sind. Wenn eine @Komponenten- oder @Konfigurationsklasse mit @Profile({"p1", "p2"}) markiert ist, wird diese Klasse nicht registriert oder verarbeitet, es sei denn, die Profile "p1" oder "p2" wurden aktiviert. Wird einem bestimmten Profil der Operator NOT (!) vorangestellt, wird das kommentierte Element nur registriert, wenn das Profil nicht aktiv ist. Wird beispielsweise @Profile({"p1", "!p2"}) angegeben, erfolgt die Registrierung, wenn das Profil "p1" aktiv ist oder wenn das Profil "p2" nicht aktiv ist.
+====
+Dazu ein Beispiel:
+
+Im Package src/main/java/ch/wesr/spring/core/container/annotation/environment/multipleprofiles gibt es folgende mit @Configuration und @Profile annotierte Klassen.
+
+* link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/multipleprofiles/config/AConfiguration.java[AConfiguration.java] mit der @Profile({"aprofile", "!cprofile"}) Annotation
+* link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/multipleprofiles/config/BConfiguration.java[BConfiguration.java] mit der @Profile({"bprofile", "!aprofile"}) Annotation
+* link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/multipleprofiles/config/CConfiguration.java[CConfiguration.java] mit der @Profile({"cprofile", "!aprofile"}) Annotation
+
+
+
+Im link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/multipleprofiles/ProfileRunner.java[ProfileRunner.java] werden 2 Profile (*aprofile* und *cprofile*) auf aktiv gesetzt.
+
+[source,java]
+----
+public class ProfileRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.getEnvironment().setActiveProfiles("aprofile", "cprofile");
+
+        context.register(AppConfig.class);
+        context.refresh();
+
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(4)
+                .containsExactly("AConfiguration", "CConfiguration", "springBean", "springBeanB");
+
+        SpringBean bean = (SpringBean) context.getBean("springBean");
+        bean.sayHello();
+
+        SpringBean beanB = (SpringBean) context.getBean("springBeanB");
+        beanB.sayHello();
+        context.close();
+    }
+}
+----
+
+
 ==== @Profile auf Methodenebene
 @Profile kann auch auf Methodenebene deklariert werden, um nur eine bestimmte Bean einer Konfigurationsklasse einzuschließen (z. B. für alternative Varianten einer bestimmten Bean), wie das folgende Beispiel zeigt:
 
-!!!! Beispiel auscodieren oder einfach hier ausweisen !!!
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/profileonmethod/ProfileRunner.java[ProfileRunner.java]
+
+[source, java]
+----
+public class ProfileRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.getEnvironment().setActiveProfiles("aprofile", "bprofile");
+        // wichtig ist, dass die activeProfiles zuerst gesetzt werden und erst dann die AppConfig.class registriert wird.
+        context.register(AppConfig.class);
+        context.refresh();
+
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(2)
+                .containsExactly("springBean", "springBeanB");
+
+        SpringBean bean = (SpringBean) context.getBean("springBean");
+        bean.sayHello();
+
+        SpringBean beanB = (SpringBean) context.getBean("springBeanB");
+        beanB.sayHello();
+
+        context.close();
+    }
+}
+----
+
+In der
+link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/profileonmethod/AppConfig.java[AppConfig.java] werden dann auf den Bean Methoden die Profiile definiert.
+
+[source,java]
+----
+@Configuration
+@ComponentScan(basePackages = {"ch.wesr.spring.core.container.annotation.environment.profileonmethod", "ch.wesr.spring.core.container.annotation.environment.beans"})
+public class AppConfig {
+
+    @Bean
+    @Profile("aprofile")
+    public SpringBean springBean() {
+        return new SpringBeanA();
+    }
+
+    @Bean
+    @Profile("bprofile")
+    public SpringBean springBeanB() {
+        return new SpringBeanB();
+    }
+}
+----
+
 
 
 und der profile Aufruf mit maven ebenfalls hier dokumentieren
