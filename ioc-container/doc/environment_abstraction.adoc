@@ -201,9 +201,60 @@ public class AppConfig {
 ----
 
 
+==== XML Bean Defintionen für Profile
 
-und der profile Aufruf mit maven ebenfalls hier dokumentieren
+Profile können natürlich auch in der XML Konfiguration definiert werden.
+
+In dieser sehr einfachen XML Konfiguration link:{resourcedir}/profiles/profile.xml[profile.xml] erkennt man, dass 2 Profile (zprofile, yprofile) über die *<bean/>*  Elemente definiert werden.
+
+[source,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <beans profile="zprofile">
+        <bean name="springBeanA" class="ch.wesr.spring.core.container.xml.profiles.profile.beans.SpringBeanA"/>
+    </beans>
+
+    <beans profile="yprofile">
+        <bean name="springBeanB" class="ch.wesr.spring.core.container.xml.profiles.profile.beans.SpringBeanB "/>
+    </beans>
+</beans>
+----
+
+In der link:{sourcedir}/ch/wesr/spring/core/container/xml/profiles/profile/ProfileRunner.java[ProfileRunner.java] Klasse wird dann die XML Konfiguration über den ClassPathXmlApplicationContext geladen.
+Wichtig dabei ist, dass danach dem ClassPathXmlApplicationContext das Profile (zprofile) gesetzt wird.
+
+[source,java]
+----
+public class ProfileRunner {
+
+    public static void main(String[] args) {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("profiles/profile.xml");
+        context.getEnvironment().setActiveProfiles("zprofile");
+        context.refresh();
+
+
+
+        List<String> beans = Arrays.stream(context.getBeanDefinitionNames())
+                .filter(bean -> !bean.contains("org.springframework")
+                        && !bean.contains("appConfig"))
+                .collect(Collectors.toList());
+        Assertions.assertThat(beans)
+                .hasSize(1)
+                .containsExactly("springBeanA");
+
+    }
+}
+----
+
+
+und der profile Aufruf mit maven ebenfalls hier dokumentieren bzw. -Dspring.profile.active oder os
 
 == Referenzen
 * https://mkyong.com/spring/spring-profiles-example/
+* https://dzone.com/articles/using-spring-profiles-xml
 
