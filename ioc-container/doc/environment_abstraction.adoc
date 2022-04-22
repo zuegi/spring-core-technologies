@@ -252,7 +252,103 @@ public class ProfileRunner {
 ----
 
 
-und der profile Aufruf mit maven ebenfalls hier dokumentieren bzw. -Dspring.profile.active oder os
+== 1.13.3 @PropertySource
+Die Spring-Annotation @PropertySource wird verwendet, um der Spring-Umgebung eine Eigenschaftsdatei bereitzustellen. Diese Annotation wird mit @Configuration-Klassen verwendet.
+
+Die Spring PropertySource-Annotation ist wiederholbar, d.h. Sie können mehrere PropertySources in einer Konfigurationsklasse haben.
+In der Datei link:{resourcedir}/config.properties[config.properties] sind folgende Key-Value Paare gesetzt.
+
+[source, text]
+----
+springbean.name=ASpringBean
+springbean.environment=Test
+springbean.module=AModule
+----
+
+In der link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/propertysource/AppConfig.java[AppConfig.java] wird ersichtlich, dass es sogar möglich ist mehrere PropetySources zu definieren (mit oder ohne @PropertySources <-- beachte Mehrzahl).
+Zudem kann man eine PropertySource ignorieren, wenn sie nicht gefunden wird, wie das mit dem *mich-gibt-es-nicht.properties* der Fall ist.
+
+Die link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/propertysource/SpringBean.java[SpringBean.java] verwendet über die @Value Annotation die entsprechenden Werte aus dem config.properties Files.
+
+[source,java]
+----
+@PropertySources({
+        @PropertySource("classpath:config.properties"),
+        @PropertySource(value = "classpath:mich-gibt-es-nicht.properties", ignoreResourceNotFound = true)
+})
+@Configuration
+public class AppConfig {
+
+
+    @Value("${springbean.name}")
+    private String springbeanName;
+
+    @Value("${springbean.environment}")
+    private String springbeanEnv;
+
+    @Value("${springbean.module}")
+    private String springBeanModule;
+
+
+    @Bean
+    public SpringBean springBean() {
+
+        SpringBean springBean = new SpringBean();
+        springBean.setName(springbeanName);
+        springBean.setEnvironment(springbeanEnv);
+        springBean.setModule(springBeanModule);
+
+        return springBean;
+    }
+}
+----
+
+In link:{sourcedir}/ch/wesr/spring/core/container/annotation/environment/propertysource/PropertySourceRunner.java[PropertySourceRunner.java] wird die SpringBean und die Environment Bean initialisiert.
+Mit der Environment Bean werden dann die Werte aus dem config.properties verglichen.
+
+[source,java]
+----
+public class PropertySourceRunner {
+
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        // get Environment bean
+        Environment env = (Environment) context.getBean("environment");
+        // get SpringBean
+        SpringBean springBean = (SpringBean) context.getBean("springBean");
+
+        Assertions.assertThat(springBean.getName()).isEqualTo(env.getProperty("springbean.name"));
+        Assertions.assertThat(springBean.getEnvironment()).isEqualTo(env.getProperty("springbean.environment"));
+        Assertions.assertThat(springBean.getModule()).isEqualTo(env.getProperty("springbean.module"));
+
+        System.out.println("hello from " +springBean.getName());
+    }
+
+}
+----
+
+Im output erkennt man die Informationsmeldung über das Property-File *mich-gibt-es-nicht.properties* was nicht gefunden wird, aber ignoriert wird - heisst keine FileNotFoundException schmeisst.
+
+[source, text]
+----
+Apr. 22, 2022 10:56:26 AM org.springframework.context.annotation.ConfigurationClassParser processPropertySource
+INFORMATION: Properties location [classpath:mich-gibt-es-nicht.properties] not resolvable: class path resource [mich-gibt-es-nicht.properties] cannot be opened because it does not exist
+hello from ASpringBean
+----
+=== PropertySource Placeholder
+Alle ${...}-Platzhalter, die in einer @PropertySource-Ressource vorhanden sind, werden anhand der Menge der bereits in der Umgebung registrierten Eigenschaftsquellen aufgelöst.
+
+Folgende Beispiele zeigen auf was damit gemeint ist
+
+[source,java]
+----
+// Verwenden einer Environment Variablen
+@PropertySource("file:${HOME}/config.properties")
+// Eine Property, die in der application.property gesetzt wird
+@PropertySource("classpath:/com/${my.placeholder:default/path}/config.properties")
+----
+
 
 == Referenzen
 * https://mkyong.com/spring/spring-profiles-example/
