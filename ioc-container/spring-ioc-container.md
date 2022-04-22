@@ -199,7 +199,7 @@ dargestellt, welche u.a. folgend Angaben besitzen
 Da gibt es eine Tabelle welche diese Metadata Configuration in ein Set von Properties übersetzt, welche jeder Bean
 Defintion ausmacht.
 
-| Property                  | Explained in...         |
+| Property                 | Explained in...          |
 |--------------------------|--------------------------|
 | Class                    | Instantiating Beans      |
 | Name                     | Naming Beans             |

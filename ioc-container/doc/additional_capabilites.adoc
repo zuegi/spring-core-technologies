@@ -95,6 +95,87 @@ Da die MessageSource von Spring auf dem ResourceBundle von Java basiert, führt 
 ====
 
 == 1.15.2 Standard and Custom Events
+=== Warum verwenden wir Events überhaupt?
+Um ein Event "abzuhören", können wir den "Listener" eines Events immer als eine weitere Methode innerhalb der Ereignisquelle schreiben, aber dadurch wird die Ereignisquelle eng an die Logik des Zuhörers gekoppelt.
+
+Bei echten Ereignissen sind wir flexibler als bei direkten Methodenaufrufen. Wir können Listener für bestimmte Events dynamisch registrieren und deregistrieren, wie wir wollen. Wir können auch mehrere Listener für dasselbe Ereignis haben.
+
+=== Standard Context Events
+Tatsächlich gibt es in Spring eine Vielzahl von eingebauten Events, die es einem Entwickler ermöglichen, sich in den Lebenszyklus einer Anwendung und den Kontext einzuklinken und eine benutzerdefinierte Operation auszuführen.
+
+Auch wenn wir diese Ereignisse nur selten manuell in einer Anwendung verwenden, nutzt das Framework sie intensiv in sich selbst. Beginnen wir mit der Erkundung verschiedener eingebauter Ereignisse in Spring.
+
+
+.Table Spring Built-in Events
+|===
+|Event                  | Beschreibung
+
+| ContextRefreshedEvent | Wenn der ApplicationContext initialisiert oder aktualisiert wird, löst Spring das ContextRefreshedEvent aus. Typischerweise kann ein Refresh mehrfach ausgelöst werden, solange der Kontext nicht geschlossen wurde.
+
+Dieses Ereignis kann auch manuell ausgelöst werden, durch den Aufruf der Methode refresh() in der Schnittstelle ConfigurableApplicationContext aufrufen.
+
+| ContextStartedEvent   | Durch den Aufruf der start()-Methode auf dem ConfigurableApplicationContext lösen wir dieses Ereignis aus und starten den ApplicationContext. Tatsächlich wird die Methode typischerweise verwendet, um Beans nach einem expliziten Stopp neu zu starten. Wir können die Methode auch verwenden, um Komponenten zu behandeln, die nicht für den Autostart konfiguriert sind.
+
+Hier ist es wichtig zu beachten, dass der Aufruf von start() im Gegensatz zu refresh() immer explizit ist.
+
+| ContextStoppedEvent   | Ein ContextStoppedEvent wird veröffentlicht, wenn der ApplicationContext gestoppt wird, indem die Methode stop() für den ConfigurableApplicationContext aufgerufen wird. Wie bereits erwähnt, können wir ein gestopptes Ereignis mit der Methode start() neu starten.
+
+| ContextClosedEvent    | Dieses Ereignis wird veröffentlicht, wenn der ApplicationContext mit der Methode close() in ConfigurableApplicationContext geschlossen wird.
+In der Realität kann ein Kontext nach dem Schließen nicht neu gestartet werden.
+
+Ein Kontext erreicht beim Schließen sein Lebensende und kann daher nicht wie bei einem ContextStoppedEvent neu gestartet werden.
+
+|RequestHandledEvent | Ein webspezifisches Ereignis, das allen Beans mitteilt, dass eine HTTP-Anfrage bearbeitet wurde. Dieses Ereignis wird veröffentlicht, nachdem die Anfrage abgeschlossen ist. Dieses Ereignis ist nur auf Webanwendungen anwendbar, die das DispatcherServlet von Spring verwenden.
+
+| ServletRequestHandledEvent | Eine Unterklasse von RequestHandledEvent, die Servlet-spezifische Kontextinformationen hinzufügt.
+|===
+
+Als Beispiel ist hier auf die Klasse link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/springevents/EventListenerContainer.java[EventListenerContainer.java] verwiesen, welche aufzeigt, wie man unter Verwendung eines @EventListeners auf einer Mehthode die verschiedenen Events auslesen kann.
+
+[source, java]
+----
+@Component
+public class EventListenerContainer {
+
+
+    @EventListener
+    public void handleContextRefreshEvent(ContextRefreshedEvent ctxStartEvt) {
+        System.out.println("Context Refresh Event received.");
+    }
+
+    @EventListener
+    public void handleContextStartEvent(ContextStartedEvent ctxStartEvt) {
+        System.out.println("Context Start Event received.");
+    }
+
+    @EventListener
+    public void handleContextStopEvent(ContextStoppedEvent ctxStoppedEvt) {
+        System.out.println("Context Stop Event received.");
+    }
+
+    @EventListener
+    public void handleContextStopEvent(ContextClosedEvent ctxClosedEvt) {
+        System.out.println("Context Closed Event received.");
+    }
+}
+----
+Siehe auch link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/springevents/SpringBuiltInEventsRunner.java[SpringBuiltInEventsRunner.java] und link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/springevents/AppConfig.java[AppConfig.java]
+
+[source, java]
+----
+public class SpringBuiltInEventsRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        context.start();
+        context.stop();
+        context.close();
+    }
+
+}
+----
+
+=== Custom Events
 
 == 1.15.3 Access to low-level Resources
 
@@ -108,3 +189,6 @@ Da die MessageSource von Spring auf dem ResourceBundle von Java basiert, führt 
 == Referenzen
 * https://lokalise.com/blog/spring-boot-internationalization/
 * https://www.baeldung.com/java-resourcebundle
+* https://www.baeldung.com/spring-context-events
+* https://www.baeldung.com/spring-events
+* https://reflectoring.io/spring-boot-application-events-explained/
