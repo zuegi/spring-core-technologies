@@ -21,10 +21,7 @@ Als Erstes müssen wir unserer Anwendung einige Sprachressourcen hinzufügen. Da
 [source,properties]
 ----
 hello=Hello!
-welcome=Welcome to my tutorial
-switch-en=Switch to English
-switch-it=Switch to Italian
-switch-de=Switch to German
+welcome=Welcome {0} to my tutorial
 ----
 
 Oben wird "lang" als Basisname für unsere Sprachressourcen dienen.
