@@ -654,5 +654,7 @@ Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen 
 ## 1.11. Using JSR 330 Standard Annotations (ist in 1.10 enthalten)
 ## 1.12 [Java-base Container Configuration](doc/container_based_configuration.adoc)
 ## 1.13 [Environment Abstraction](doc/environment_abstraction.adoc)
+## 1.14 Registering a LoadTimeWeaver 
+## 1.15  [Additional Capabilities of the ApplicationContext]()
 ## to be completed
 

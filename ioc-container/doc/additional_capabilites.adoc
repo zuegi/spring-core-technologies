@@ -1,0 +1,112 @@
+= 1.15 Additional Capabilites of the ApplicationContext
+:sourcedir: ../src/main/java
+:resourcedir: ../src/main/resources
+:docudir: ..
+:toc:
+:sectnumlevels: 5
+
+1.15.1 Internalization using MessageSource
+
+Das Interface ApplicationContext erweitert das BeanFactory Interface um zusätzliche Funktionalität in einem anwendungsoritentierten Stil bereit zu stellen.
+Folgende Funktionalitäten werden hier vorgestellt.
+
+* *Zugriff auf Messages* im i18n-Stil über die Schnittstelle MessageSource (Internalization).
+* *Zugriff auf Ressourcen*, wie URLs und Dateien, über die Schnittstelle ResourceLoader.
+* *Veröffentlichung von Events*, insbesondere für Beans, die die ApplicationListener-Schnittstelle implementieren, durch die Verwendung der ApplicationEventPublisher-Schnittstelle.
+* *Laden mehrerer (hierarchischer) Kontexte*, die sich jeweils auf eine bestimmte Schicht konzentrieren können, z. B. die Web-Schicht einer Anwendung, über die Schnittstelle HierarchicalBeanFactory.
+
+== 1.15.1 Internalization using MessageSource
+Als Erstes müssen wir unserer Anwendung einige Sprachressourcen hinzufügen. Dazu erstellt man im resources Verzeichnis ein neues *Verzeichnis lang* und ein *Properties File link:{resourcedir}/lang/lang_en.properties[lang.properties]*.
+
+
+[source,properties]
+----
+hello=Hello!
+welcome=Welcome to my tutorial
+switch-en=Switch to English
+switch-it=Switch to Italian
+switch-de=Switch to German
+----
+
+Oben wird "lang" als Basisname für unsere Sprachressourcen dienen.
+*lang_en.properties* stellt die Standard-Ressourcendatei dar, auf die unsere Spring Boot-Anwendung zurückgreift, wenn keine Übereinstimmung gefunden wurde.
+
+2 weitere Properties Dateien
+* lang_it.properties
+* lang_de.properties
+werden hinzugefügt
+
+Standardmässig entnimmt Spring  den Basisnamen einer Spring-Property namens *spring.messages.basename* oder, falls diese fehlt, versucht es, ihn aus einer Property Datei *namens messages.properties* zu entnehmen.
+
+[source, java]
+----
+String basename = context.getEnvironment().getProperty("spring.messages.basename", "messages");
+----
+
+Ein Eintrag *spring.messages.basename* in der Datei link:{resourcedir}/props/application.properties[application.properties], definiert den Basisnamen für die Sprachressourcen angibt.
+
+[source,properties]
+----
+spring.messages.basename=lang/lang
+----
+
+oder aber programmatisch über die link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/i18n/I18nRunner.java[I18nRunner.java] Klasse
+
+[source, java]
+----
+public class I18nRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        context.refresh();
+
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasenames("lang/lang");
+
+
+        System.out.println(messageSource.getMessage("hello", null, Locale.ITALIAN));
+        System.out.println(messageSource.getMessage("welcome", new Object[]{"Bruno"}, Locale.ITALIAN));
+
+        System.out.println(messageSource.getMessage("hello", null, Locale.GERMAN));
+        System.out.println(messageSource.getMessage("welcome", new Object[]{"Wolfgang"}, Locale.GERMAN));
+
+        System.out.println(messageSource.getMessage("hello", null, Locale.ENGLISH));
+        System.out.println(messageSource.getMessage("welcome", new Object[]{"Paul"}, Locale.ENGLISH));
+
+    }
+}
+----
+Die im obigen Beispiel verwendete ReloadableResourceBundleMessageSource Klasse gilt als Alternative zu ResourceBundleMessageSource-Klasse. Diese Variante unterstützt das gleiche Bundle-Dateiformat, ist aber flexibler als die standardmäßige JDK-basierte ResourceBundleMessageSource-Implementierung. Insbesondere ermöglicht sie das Lesen von Dateien von einem beliebigen Spring-Ressourcen-Speicherort (nicht nur vom Klassenpfad) und unterstützt das Nachladen von Bundle-Eigenschaftsdateien im laufenden Betrieb (während sie diese effizient zwischenspeichert). Siehe die Javadoc der ReloadableResourceBundleMessageSource für Details.
+
+Einfach ausgedrückt, ermöglicht das ResourceBundle unserer Anwendung, Daten aus verschiedenen Dateien zu laden, die ortsspezifische Daten enthalten.
+
+=== output
+[source, text]
+----
+ Ciao!
+Benvenuto Bruno al mio tutorial
+Hallo!
+Willkommen Wolfgang in meinem Tutorial
+Hello!
+Welcome Paul to my tutorial
+----
+
+[NOTE]
+====
+Da die MessageSource von Spring auf dem ResourceBundle von Java basiert, führt sie Bundles mit demselben Basisnamen nicht zusammen, sondern verwendet nur das erste gefundene Bundle. Nachfolgende Message-Bundles mit demselben Basisnamen werden ignoriert.
+====
+
+== 1.15.2 Standard and Custom Events
+
+== 1.15.3 Access to low-level Resources
+
+== 1.15.4 Application Startup Tracking
+
+== 1.15.5 Application Context Instantiation
+
+== 1.15.6 Deployeing a Spring ApplicationContext as Java EE RAR File????
+
+
+== Referenzen
+* https://lokalise.com/blog/spring-boot-internationalization/
+* https://www.baeldung.com/java-resourcebundle
