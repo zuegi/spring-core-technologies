@@ -5,7 +5,6 @@
 :toc:
 :sectnumlevels: 5
 
-1.15.1 Internalization using MessageSource
 
 Das Interface ApplicationContext erweitert das BeanFactory Interface um zusätzliche Funktionalität in einem anwendungsoritentierten Stil bereit zu stellen.
 Folgende Funktionalitäten werden hier vorgestellt.
@@ -45,6 +44,8 @@ String basename = context.getEnvironment().getProperty("spring.messages.basename
 
 Ein Eintrag *spring.messages.basename* in der Datei link:{resourcedir}/props/application.properties[application.properties], definiert den Basisnamen für die Sprachressourcen angibt.
 
+Einfach ausgedrückt, ermöglicht das ResourceBundle unserer Anwendung, Daten aus verschiedenen Dateien zu laden, die ortsspezifische Daten enthalten.
+
 [source,properties]
 ----
 spring.messages.basename=lang/lang
@@ -78,7 +79,7 @@ public class I18nRunner {
 ----
 Die im obigen Beispiel verwendete ReloadableResourceBundleMessageSource Klasse gilt als Alternative zu ResourceBundleMessageSource-Klasse. Diese Variante unterstützt das gleiche Bundle-Dateiformat, ist aber flexibler als die standardmäßige JDK-basierte ResourceBundleMessageSource-Implementierung. Insbesondere ermöglicht sie das Lesen von Dateien von einem beliebigen Spring-Ressourcen-Speicherort (nicht nur vom Klassenpfad) und unterstützt das Nachladen von Bundle-Eigenschaftsdateien im laufenden Betrieb (während sie diese effizient zwischenspeichert). Siehe die Javadoc der ReloadableResourceBundleMessageSource für Details.
 
-Einfach ausgedrückt, ermöglicht das ResourceBundle unserer Anwendung, Daten aus verschiedenen Dateien zu laden, die ortsspezifische Daten enthalten.
+
 
 === output
 [source, text]
