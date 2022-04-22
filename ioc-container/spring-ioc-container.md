@@ -655,6 +655,6 @@ Stattdessen kann der Spring IoC-Container durch Einfügen von Implementierungen 
 ## 1.12 [Java-base Container Configuration](doc/container_based_configuration.adoc)
 ## 1.13 [Environment Abstraction](doc/environment_abstraction.adoc)
 ## 1.14 Registering a LoadTimeWeaver 
-## 1.15  [Additional Capabilities of the ApplicationContext]()
+## 1.15  [Additional Capabilities of the ApplicationContext](doc/additional_capabilites.adoc)
 ## to be completed
 
