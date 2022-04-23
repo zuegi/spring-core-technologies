@@ -78,7 +78,7 @@ Die im obigen Beispiel verwendete ReloadableResourceBundleMessageSource Klasse g
 
 
 
-=== output
+==== output
 [source, text]
 ----
  Ciao!
@@ -175,7 +175,141 @@ public class SpringBuiltInEventsRunner {
 }
 ----
 
-=== Custom Events
+=== Synchrone Custom Events
+Mit Spring können wir benutzerdefinierte Events/Ereignisse erstellen und veröffentlichen, die standardmäßig synchron sind. Dies hat einige Vorteile, z. B. kann der #*Listener am Transaktionskontext des Publishers teilnehmen*#. Des weiteren können unbegrenzt Ereignis-Listener registriert werden.
+Weil die Event-Listener Events standardmäßig synchron empfangen, #blockiert die Methode publishEvent()#, bis alle Listener die Verarbeitung des Ereignisses abgeschlossen haben.
+
+==== Email Versenden an whiteliste Empfänger
+Am Beispiel einer Whitelist Konfiguration in einem Properties File link:{resourcedir}/props/email-config.properties[email-config.properties], werden 2 Email Adressen in eine Whitelist aufgenommen, mit dem Ziel, dass nur an diese beiden Empfänger Emails versendet werden.
+
+[source, properties]
+----
+email.config.whitelist=mary@example.org,paula@example.org
+----
+
+in der link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/service//EmailService.java[EmailService.java] Klasse wird die Whitelist über eine PropertySource (siehe link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/EmailConfig.java[EmailConfig.java]) aus dem Property File in eine ArrayList eingelesen.
+Vor dem pushen eines Events wird diese whitelist konsultiert und falls die Email-Adresse nicht in der Whitelist vorhanden, ein link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/events/BlockedEmailEvent.java[BlockedEMailEvent],
+[source, java]
+----
+@Getter
+@Setter
+public class BlockedEmailEvent extends ApplicationEvent {
+    private final String emailAddress;
+    private final String content;
+
+    public BlockedEmailEvent(Object source, String emailAddress, String content) {
+        super(source);
+        this.emailAddress = emailAddress;
+        this.content = content;
+    }
+}
+----
+
+andernfalls  ein link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/events/SendEmailEvent.java[SendMailEvent]
+[source, java]
+----
+@Getter
+@Setter
+public class SendEmailEvent extends ApplicationEvent {
+    private final String emailAddress;
+    private final String content;
+
+    public SendEmailEvent(Object source, String emailAddress, String content) {
+        super(source);
+        this.emailAddress = emailAddress;
+        this.content = content;
+    }
+}
+----
+ausgelöst.
+
+[source,java]
+----
+@Service
+public class EmailService {
+
+    // Splitten des Property in eine ArrayList
+    @Value("#{'${email.config.whitelist}'.split(',')}")
+    private List<String> whitelist;
+    @Autowired
+    ApplicationEventPublisher publisher;
+
+    public void sendEmail(String address, String content) {
+        // wenn die Email Adresse nicht in der whitelist enthalten ist
+        if (!whitelist.contains(address)) {
+            publisher.publishEvent(new BlockedEmailEvent(this, address, content));
+            return;
+        }
+        // die Email Adresse ist in der whitelist vorhanden
+        publisher.publishEvent(new SendEmailEvent(this, address, content));
+    }
+
+}
+----
+
+[NOTE]
+====
+Anstatt den ApplicationEventPublisher mit der @Autowire Annotation zu injecten, hätte man auch von dem Interface ApplicationEventPublisherAware ableiten können. Siehe im Code Beispiel hier link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/service/EmailServiceAware.java[EmailServiceAware.java]
+====
+
+In der Klasse link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/listener/EmailServiceListener.java[EmailServiceListener.java] welche als Komponten gestartet wird, werden dann über die Methoden mit deren Annoation @EventListener die Events abgefangen und entsprechend reagiert
+
+[source, java]
+----
+@Component
+public class EmailServiceListener {
+
+    @EventListener
+    public void processBlockedEmailEvent(BlockedEmailListEvent event) {
+        System.out.println("Diese EmailAdresse [" +event.getEmailAddress() +"] wurde blockiert und nicht versendet");
+    }
+
+    @EventListener
+    public void processSendEmailEvent(SendEmailEvent event) {
+        System.out.println("Versende Email an [" +event.getEmailAddress() +"]");
+    }
+}
+----
+
+[NOTE]
+====
+Anstelle der Annotation @EventListener auf den Methoden, könnte auch das Interface ApplicationListener implementiert werden. Siehe im Code Beispiel link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/listener/BlockedEmailEventListener.java[BlockedEmailEventListener.java]. Allerdings braucht es hier für jeden Event einen dedizierten Listener.
+====
+
+Wie schon so oft, ruft eine link:{sourcedir}/ch/wesr/spring/core/container/annotation/additional/custom/events/synchron/EmailServiceRunner.java[EmailServiceRunner] Klasse den entsprechenden EmailService auf.
+
+[source, java]
+----
+public class EmailServiceRunner {
+
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(EmailConfig.class);
+
+        EmailService emailService = context.getBean(EmailService.class);
+        emailService.sendEmail("known.hacker@example.org", "Das ist ein Inhalt für Hacker Peter");
+        emailService.sendEmail("known.spammer@example.org", "Das ist ein Inhalt für Spammer Paul");
+        emailService.sendEmail("mary@example.org", "Das ist ein Inhalt für Mary");
+        emailService.sendEmail("mary@xeample.org", "Das ist ein Inhalt für Mary, aber eine einem kleinen Verschreiber in der Domain Adresse");
+        emailService.sendEmail("paula@example.org", "Das ist ein Inhalt für Paula");
+    }
+}
+----
+
+==== output
+[source,text]
+----
+Diese EmailAdresse [known.hacker@example.org] wurde blockiert und nicht versendet
+Diese EmailAdresse [known.spammer@example.org] wurde blockiert und nicht versendet
+Versende Email an [mary@example.org]
+Diese EmailAdresse [mary@xeample.org] wurde blockiert und nicht versendet
+Versende Email an [paula@example.org]
+----
+
+Wenn eine andere Strategie für das Event-Publishing erforderlich ist, dann gibt es in der Javadoc für die Schnittstelle #ApplicationEventMulticaster# und die Implementierung ##SimpleApplicationEventMulticaste##r von Spring entsprechende Konfigurationsoptionen.
+
+
+
+==== Asynchrone Custom Events
 
 == 1.15.3 Access to low-level Resources
 
