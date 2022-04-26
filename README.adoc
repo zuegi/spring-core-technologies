@@ -13,7 +13,7 @@ Die verwendete Spring Version in den Code Beispielen ist
 
 == Inhalt
 * link:./ioc-container/spring-ioc-container.md[Der Inversion of Control Container]
-
+* link:resources/resources.adoc[Resources]
 
 == Referenzen
 * http://www.wideskills.com/spring-tutorial[Wideskills spring-tutorial]
