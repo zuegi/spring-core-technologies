@@ -5,3 +5,40 @@
 :toc:
 :sectnumlevels: 5
 
+== Kurze Einführung
+Oft muss man externe Resourcen wie Text Files, XML Files, Properties Files und Image Files in die Spring Applikation einlesen. Diese Ressourcen können an verschiedenen Orten vorhanden sein. Zum Beispiel im Dateisystem, im Klassenpfad oder in der URL. Normalerweise müsste man in Java verschiedene APIs verwenden um Resourcen von verschiedenen Orten zu lesen.
+Um solche Aufgaben zu bewältigen, bietet Spring die Schnittstellen Resource und ResourceLoader. Die Resource-Schnittstelle repräsentiert externe Ressourcen. Die ResourceLoader-Schnittstelle bietet Methoden zum Laden von Ressourcen.
+
+== Das Resource Interface
+Das Resource Interface repräsentiert externe Resourcen in Spring. Dazu gibt es verschiedene Implementierungen.
+
+Der Code des Resource Interface sieht so aus.
+[source, java]
+====
+public interface Resource extends InputStreamSource {
+    boolean exists();
+    boolean isOpen();
+    URL getURL() throws IOException;
+    File getFile() throws IOException;
+    Resource createRelative(String relativePath) throws IOException;
+    String getFilename();
+    String getDescription();
+}
+====
+
+Das Interface erweitert das InputStreamSource Interface und hat einige wichtige Methoden:
+
+* *getInputStream()*: Lokalisiert und öffnet eine Resource und gibt einen InputStream zurück.
+* *exists()*: gibt ein boolean zurück, wenn die Resource physikalisch existiert
+* *isOpen()*: gibt ein boolean zurück, der angibt, ob die Resource ein offener Handle repräsentiert oder nicht.
+* *getDescription()*: Gibt eine Beschreibung für diese Ressource zurück. Die Beschreibung kann für die Fehlerausgabe bei der Arbeit mit der Ressource verwendet werden. Die Beschreibung ist oft der voll qualifizierte Dateiname oder die tatsächliche URL der Ressource.
+
+== Resource Implementierungen
+Spring bietet mehrere Implementierungen für die Schnittstelle Resources an:
+
+* *URLRessource*: Stellt eine Ressource dar, die von einer URL geladen wurde.
+* *ClassPathResource*: Stellt eine Ressource dar, die aus dem Klassenpfad geladen wurde.
+* *FileSystemResource*: Stellt eine Ressource dar, die aus dem Dateisystem geladen wird.
+* *ServletContextResource*: Diese Implementierung ist für ServletContext-Ressourcen gedacht. Sie interpretiert relative Pfade innerhalb des Stammverzeichnisses der jeweiligen Webanwendung.
+* *InputStreamResource*: Stellt eine Inputstream-Ressource dar.
+* *ByteArrayResource*: Stellt eine Byte-Array-Ressource dar.

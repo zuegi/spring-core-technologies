@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class SpringBean {
 
-    private String name;
+ private String name;
     private String environment;
     private String module;
 
