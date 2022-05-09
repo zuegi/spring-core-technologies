@@ -5,6 +5,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resources;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,6 +41,11 @@ public class ResourceLoaderService {
 
     public String zeigeResourceAusDemClasspath() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:hallo.txt");
+        return getStringFromResource(resource);
+    }
+
+    public String zeigeResourcesAusWebSeite() throws IOException {
+        Resource resource = resourceLoader.getResource("https://en.tutiempo.net/climate/ws-67710.html");
         return getStringFromResource(resource);
     }
 }

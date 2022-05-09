@@ -22,5 +22,11 @@ public class ResourceLoaderRunner {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        try {
+            Assertions.assertThat(loaderService.zeigeResourcesAusWebSeite()).contains("Climate STABIO");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

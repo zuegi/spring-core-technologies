@@ -42,3 +42,8 @@ Spring bietet mehrere Implementierungen für die Schnittstelle Resources an:
 * *ServletContextResource*: Diese Implementierung ist für ServletContext-Ressourcen gedacht. Sie interpretiert relative Pfade innerhalb des Stammverzeichnisses der jeweiligen Webanwendung.
 * *InputStreamResource*: Stellt eine Inputstream-Ressource dar.
 * *ByteArrayResource*: Stellt eine Byte-Array-Ressource dar.
+
+
+Todo
+* code mit einer url
+* code hier dokumentieren
