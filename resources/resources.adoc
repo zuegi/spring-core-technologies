@@ -1,7 +1,7 @@
 = 2 Resources
-:sourcedir: ../src/main/java
-:resourcedir: ../src/main/resources
-:docudir: ..
+:sourcedir: ./src/main/java/ch/wesr/spring/core/resources
+:resourcedir: ./src/main/resources
+:docudir: ./doc
 :toc:
 :sectnumlevels: 5
 
@@ -13,8 +13,9 @@ Um solche Aufgaben zu bewältigen, bietet Spring die Schnittstellen Resource und
 Das Resource Interface repräsentiert externe Resourcen in Spring. Dazu gibt es verschiedene Implementierungen.
 
 Der Code des Resource Interface sieht so aus.
-[source, java]
-====
+
+[source,java]
+----
 public interface Resource extends InputStreamSource {
     boolean exists();
     boolean isOpen();
@@ -24,7 +25,7 @@ public interface Resource extends InputStreamSource {
     String getFilename();
     String getDescription();
 }
-====
+----
 
 Das Interface erweitert das InputStreamSource Interface und hat einige wichtige Methoden:
 
@@ -44,6 +45,86 @@ Spring bietet mehrere Implementierungen für die Schnittstelle Resources an:
 * *ByteArrayResource*: Stellt eine Byte-Array-Ressource dar.
 
 
-Todo
-* code mit einer url
-* code hier dokumentieren
+== Implementierung
+Schauen wir uns anhand eines Beipiels die Implementierung an.
+
+In der link:{sourcedir}/ResourceLoaderRunner.java[ResourceLoaderRunner.java] Klasse
+
+[source, java]
+----
+public class ResourceLoaderRunner {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        ResourceLoaderService loaderService = context.getBean(ResourceLoaderService.class);
+        // lies aus einer FilePath Resource
+        try {
+            Assertions.assertThat(loaderService.zeigeResourceDataMitFilePath()).contains("= 2 Resources");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //        lies aus einer classpath resource
+        try {
+            Assertions.assertThat(loaderService.zeigeResourceAusDemClasspath()).contains("hallo ich bin der Inhalt eines hallo.txt files aus dem classpath");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // lies aus einer http resource
+        try {
+            Assertions.assertThat(loaderService.zeigeResourcesAusWebSeite()).contains("Climate STABIO");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+----
+
+Wird der Service link:{sourcedir}/ResourceLoaderService.java[ResourceLoaderService.java] aus dem ApplicationContext geladen und mit den entsprechenden Methoden die Resource angezogen.
+
+[source,java]
+----
+@Service
+public class ResourceLoaderService {
+
+    @Autowired
+    ResourceLoader resourceLoader;
+
+    public String zeigeResourceDataMitFilePath() throws IOException {
+        Resource resource = resourceLoader.getResource("file:/Users/groot/WS/SpringProfessionalExam/spring-core-technologies/resources/resources.adoc");
+        return getStringFromResource(resource);
+    }
+
+    private String getStringFromResource(Resource resource) throws IOException {
+        InputStream in = resource.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder stringBuilder = new StringBuilder();
+        while (true) {
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+            stringBuilder.append(line);
+            stringBuilder.append("\n");
+        }
+        reader.close();
+        assert stringBuilder != null;
+        return stringBuilder.toString();
+    }
+
+    public String zeigeResourceAusDemClasspath() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:hallo.txt");
+        return getStringFromResource(resource);
+    }
+
+    public String zeigeResourcesAusWebSeite() throws IOException {
+        Resource resource = resourceLoader.getResource("https://en.tutiempo.net/climate/ws-67710.html");
+        return getStringFromResource(resource);
+    }
+}
+----
+
+Im Service wird dann der ResourceLoader injected über welchen dann die getResource() Methode aufgerufen wird.
+Achte auf die Protokoll Angabe wie
+* file: - damit wird eine FileSystemResource erzwungen
+* claspath: - damit wird eine ClasspathResource erzwungen
+* https: - damit wird eine UrlResource erzwungen
+* (none) - je nach darunter liegendem ApplicationContext wird versucht der entsprechende ResourceLoader zu ermitteln.
